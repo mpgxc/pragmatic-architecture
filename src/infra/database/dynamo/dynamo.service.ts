@@ -1,6 +1,6 @@
-import { ConfigService } from '@nestjs/config';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class DynamoDBClientService
@@ -9,9 +9,16 @@ export class DynamoDBClientService
 {
   constructor(config: ConfigService) {
     super({
-      endpoint: config.getOrThrow('AWS_URL'),
-      region: config.getOrThrow('AWS_REGION'),
+      region: config.get<string>('AWS_REGION'),
+      credentials: {
+        accessKeyId: config.get<string>('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: config.get<string>('AWS_SECRET_ACCESS_KEY'),
+      },
     });
+  }
+
+  onModuleInit() {
+    return this;
   }
 
   onModuleDestroy() {
