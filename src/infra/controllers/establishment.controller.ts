@@ -1,7 +1,8 @@
 import { LoggerInject, LoggerService } from '@mpgxc/logger';
-import { Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { RegisterEstablishment } from '@usecases/register-establishment';
+import { EstablishmentInput } from './validators/establishment';
 
 @ApiTags('Establishments')
 @Controller('establishments')
@@ -9,7 +10,7 @@ export class EstablishmentController {
   constructor(
     @LoggerInject(EstablishmentController.name)
     private readonly logger: LoggerService,
-    private readonly usecase: RegisterEstablishment,
+    private readonly registerEstablishment: RegisterEstablishment,
   ) {}
 
   @Post()
@@ -17,9 +18,13 @@ export class EstablishmentController {
   @ApiCreatedResponse({
     description: 'The establishment has been successfully registered.',
   })
-  async handle() {
-    await this.usecase.execute();
+  async create(@Body() payload: EstablishmentInput): Promise<void> {
+    this.logger.log('create > params', {
+      payload,
+    });
 
-    this.logger.log('Establishment registered');
+    await this.registerEstablishment.execute(payload);
+
+    this.logger.log('create > success');
   }
 }

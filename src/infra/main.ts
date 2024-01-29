@@ -13,7 +13,7 @@ import { InfraModule } from './infra.module';
   const app = await NestFactory.create<NestFastifyApplication>(
     InfraModule,
     new FastifyAdapter({
-      logger: true,
+      logger: process.env.NODE_ENV === 'prd',
     }),
     {
       cors: true,
