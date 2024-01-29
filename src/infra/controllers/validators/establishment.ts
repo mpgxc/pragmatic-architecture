@@ -4,7 +4,6 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsPhoneNumber,
   IsString,
@@ -19,11 +18,11 @@ export class Address {
   })
   street: string;
 
-  @IsNumber()
+  @IsString()
   @ApiProperty({
     required: true,
   })
-  number: number;
+  number: string;
 
   @IsString()
   @IsOptional()

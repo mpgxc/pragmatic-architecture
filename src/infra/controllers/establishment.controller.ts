@@ -1,7 +1,7 @@
 import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { RegisterEstablishment } from '@usecases/register-establishment';
+import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { EstablishmentInput } from './validators/establishment';
 
 @ApiTags('Establishments')
