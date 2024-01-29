@@ -22,6 +22,7 @@
       "@infra/*": ["src/infra/*"],
       "@domain/*": ["src/domain/*"],
       "@usecases/*": ["src/usecases/*"],
+      "@common/*": ["src/common/*"],
     },
   },
 }
