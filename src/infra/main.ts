@@ -36,17 +36,21 @@ import { InfraModule } from './infra.module';
   app.useLogger(logger);
   app.setGlobalPrefix('api');
 
-  const document = SwaggerModule.createDocument(
-    app,
-    new DocumentBuilder()
-      .setTitle('VamoJogar API')
-      .setDescription('Monolithic API for VamoJogar')
-      .setVersion('1.0')
-      .addTag('VamoJogar')
-      .build(),
-  );
+  const enableSwagger = ['dev', 'hml'].includes(config.getOrThrow('NODE_ENV'));
 
-  SwaggerModule.setup('api', app, document);
+  if (enableSwagger) {
+    const document = SwaggerModule.createDocument(
+      app,
+      new DocumentBuilder()
+        .setTitle('VamoJogar API')
+        .setDescription('Monolithic API for VamoJogar')
+        .setVersion('1.0')
+        .addTag('VamoJogar')
+        .build(),
+    );
+
+    SwaggerModule.setup('/api/docs', app, document);
+  }
 
   await app.listen(+config.getOrThrow('PORT'), '0.0.0.0');
 

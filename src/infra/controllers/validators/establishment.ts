@@ -1,3 +1,4 @@
+import { Address, Establishment } from '@domain/establishment/establishment';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -10,7 +11,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 
-export class Address {
+export class EstablishmentAddress {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -76,7 +77,7 @@ export class EstablishmentHours {
   close: string;
 }
 
-export class EstablishmentInput {
+export class EstablishmentInput implements Establishment {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -101,12 +102,12 @@ export class EstablishmentInput {
   @ApiProperty({
     required: true,
   })
-  @Type(() => Address)
+  @Type(() => EstablishmentAddress)
   @ValidateNested({
     each: true,
     always: true,
   })
-  address: Address;
+  address: EstablishmentAddress;
 
   @IsEmail()
   @IsNotEmpty()
@@ -137,4 +138,43 @@ export class EstablishmentInput {
     required: false,
   })
   description?: string;
+}
+
+export class EstablishmentOutput implements Establishment {
+  @ApiProperty()
+  owner: string;
+
+  @ApiProperty()
+  phone: string;
+
+  @ApiProperty()
+  cnpj: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty({
+    type: EstablishmentAddress,
+  })
+  address: Address;
+
+  @ApiProperty()
+  rating?: number;
+
+  @ApiProperty()
+  pictures?: string[];
+
+  @ApiProperty()
+  description?: string;
+
+  @ApiProperty({
+    type: EstablishmentHours,
+  })
+  hours: {
+    open: string;
+    close: string;
+  };
 }

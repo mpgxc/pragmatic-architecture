@@ -5,6 +5,8 @@ import { LoggerModule } from '@mpgxc/logger';
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { DatabaseModule } from './database/database.module';
+import { GetEstablishment } from '@usecases/establishments/get-establishment';
+import { ListEstablishments } from '@usecases/establishments/list-establishments';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { DatabaseModule } from './database/database.module';
     }),
     DatabaseModule,
   ],
-  providers: [RegisterEstablishment],
+  providers: [RegisterEstablishment, GetEstablishment, ListEstablishments],
   controllers: [EstablishmentController],
 })
 export class InfraModule {}
