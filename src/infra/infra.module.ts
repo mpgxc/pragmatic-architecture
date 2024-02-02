@@ -1,15 +1,15 @@
+import { LoggerModule } from '@mpgxc/logger';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
-
-import { LoggerModule } from '@mpgxc/logger';
-import { HttpModule } from '@nestjs/axios';
 import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { HealthCheckController } from './controllers/health.controller';
+import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
+import { ProvidersModule } from './providers/providers.module';
 
 @Module({
   imports: [
@@ -21,9 +21,13 @@ import { DatabaseModule } from './database/database.module';
     }),
     DatabaseModule,
     TerminusModule,
-    HttpModule,
+    ProvidersModule,
   ],
   providers: [RegisterEstablishment, GetEstablishment, ListEstablishments],
-  controllers: [EstablishmentController, HealthCheckController],
+  controllers: [
+    EstablishmentController,
+    HealthCheckController,
+    ThirdPartyController,
+  ],
 })
 export class InfraModule {}
