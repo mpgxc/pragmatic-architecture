@@ -10,6 +10,7 @@ import { HealthCheckController } from './controllers/health.controller';
 import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { ProvidersModule } from './providers/providers.module';
+import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
 
 @Module({
   imports: [
@@ -23,7 +24,12 @@ import { ProvidersModule } from './providers/providers.module';
     TerminusModule,
     ProvidersModule,
   ],
-  providers: [RegisterEstablishment, GetEstablishment, ListEstablishments],
+  providers: [
+    RegisterEstablishment,
+    GetEstablishment,
+    ListEstablishments,
+    UpdateEstablishment,
+  ],
   controllers: [
     EstablishmentController,
     HealthCheckController,

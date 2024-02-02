@@ -11,3 +11,5 @@ export type Pagination = {
   page?: string | undefined;
   limit: number;
 };
+
+export type DynamoCommand<T> = Omit<T, 'TableName'>;

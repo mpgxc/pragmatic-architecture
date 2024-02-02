@@ -9,6 +9,7 @@ export type Address = {
 };
 
 export type Establishment = {
+  id?: string;
   owner: string;
   phone: string;
   cnpj: string;

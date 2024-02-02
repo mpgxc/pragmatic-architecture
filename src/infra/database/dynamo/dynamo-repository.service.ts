@@ -8,12 +8,14 @@ import {
   QueryCommand,
   QueryCommandInput,
   QueryCommandOutput,
+  UpdateItemCommand,
+  UpdateItemCommandOutput,
+  UpdateItemInput,
   paginateQuery,
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
 import { DynamoDBClientService } from './dynamo.service';
-
-type DynamoCommand<T> = Omit<T, 'TableName'>;
+import { DynamoCommand } from './type';
 
 @Injectable()
 export class DynamoRepositoryService {
@@ -89,6 +91,14 @@ export class DynamoRepositoryService {
         ...params,
         TableName: this.TableName,
       }),
+    );
+  }
+
+  async update(
+    params: DynamoCommand<UpdateItemInput>,
+  ): Promise<UpdateItemCommandOutput> {
+    return this.client.send(
+      new UpdateItemCommand({ TableName: this.TableName, ...params }),
     );
   }
 }

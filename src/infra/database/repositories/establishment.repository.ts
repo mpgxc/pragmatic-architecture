@@ -1,13 +1,17 @@
+import { randomUUID } from 'crypto';
+
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { entityFactory } from '@common/helpers';
-import { Establishment } from '@domain/establishment/establishment';
+import { QueryInput, UpdateItemInput } from '@aws-sdk/client-dynamodb';
+
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
+
+import { entityFactory } from '@common/helpers';
+import { Establishment } from '@domain/establishment/establishment';
+
 import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
-import { QueryCommandInput } from '@aws-sdk/client-dynamodb';
-import { Pagination } from '../dynamo/type';
+import { DynamoCommand, Pagination } from '../dynamo/type';
 
 @Injectable()
 export class EstablishmentRepository extends ExtraRepositoryMethods {
@@ -23,12 +27,12 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
   }
 
   async create(props: Establishment) {
-    const SK = randomUUID();
+    const id = randomUUID();
 
     const content = entityFactory<Establishment>({
-      PK: `ESTABLISHMENT#${SK}`,
+      PK: `ESTABLISHMENT#${id}`,
       SK: `PARTNER#${this.partnerId}`,
-      Content: { ...props, id: SK },
+      Content: { ...props, id },
       Status: 'Ativo',
     });
 
@@ -62,7 +66,7 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
   async list(pagination: Pagination) {
     const { sort, limit, page } = pagination || {};
 
-    const command: Omit<QueryCommandInput, 'TableName'> = {
+    const commandQuery: DynamoCommand<QueryInput> = {
       KeyConditionExpression: '#SK = :SK',
       ExpressionAttributeNames: {
         '#PK': 'PK',
@@ -85,7 +89,7 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     );
 
     const { Items, LastEvaluatedKey, Count } = await this.client.query({
-      ...command,
+      ...commandQuery,
       Limit,
       ScanIndexForward,
       ExclusiveStartKey,
@@ -93,9 +97,32 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     });
 
     return {
-      Items: Items.map((o) => this.dynamoItemMapper<Establishment>(o)),
+      Items: Items.map((item) => this.dynamoItemMapper<Establishment>(item)),
       LastEvaluatedKey: this.extractCurrentPage(LastEvaluatedKey) || '',
       Count,
     };
+  }
+
+  async update(props: Establishment) {
+    const commandInput: DynamoCommand<UpdateItemInput> = {
+      Key: marshall({
+        PK: `ESTABLISHMENT#${props.id}`,
+        SK: `PARTNER#${this.partnerId}`,
+      }),
+      ExpressionAttributeNames: {
+        '#Name': 'name',
+        '#Phone': 'phone',
+        '#Owner': 'owner',
+      },
+      UpdateExpression:
+        'set Content.#Name = :name, Content.#Phone = :phone, Content.#Owner = :owner',
+      ExpressionAttributeValues: marshall({
+        ':name': props.name,
+        ':phone': props.phone,
+        ':owner': props.owner,
+      }),
+    };
+
+    await this.client.update(commandInput);
   }
 }

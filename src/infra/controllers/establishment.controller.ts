@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -18,6 +19,7 @@ import {
 import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
 import { QueryParams } from './validators/query';
+import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
 
 @ApiTags('Establishments')
 @Controller('establishments')
@@ -28,6 +30,7 @@ export class EstablishmentController {
     private readonly registerEstablishment: RegisterEstablishment,
     private readonly getEstablishment: GetEstablishment,
     private readonly listEstablishments: ListEstablishments,
+    private readonly updateEstablishment: UpdateEstablishment,
   ) {}
 
   @Post()
@@ -62,5 +65,18 @@ export class EstablishmentController {
     });
 
     return output;
+  }
+
+  @Put('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiCreatedResponse({
+    description: 'The establishment has been successfully updated',
+  })
+  async update(@Param('id') id: string, @Body() body: EstablishmentInput) {
+    this.logger.log('update establishment', { id });
+
+    await this.updateEstablishment.execute({ ...body, id });
+
+    this.logger.log('finish update establisment');
   }
 }
