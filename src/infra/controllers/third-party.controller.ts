@@ -18,6 +18,6 @@ export class ThirdPartyController {
 
   @Get('cep/:cep')
   async getCep(@Param('cep') cep: string) {
-    throw new Error('Not implemented');
+    return this.cepProvider.getCep(cep);
   }
 }

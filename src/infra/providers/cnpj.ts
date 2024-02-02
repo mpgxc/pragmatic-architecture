@@ -1,3 +1,4 @@
+import { AddressInfo } from '@common/types';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
@@ -26,16 +27,7 @@ type BusinessInfoOutput = {
   cnpj: string;
   phones: string[];
   partners: string[];
-  address: {
-    uf: string;
-    cep: string;
-    bairro: string;
-    numero: string;
-    logradouro: string;
-    municipio: string;
-    complemento: string;
-    prefix_logradouro: string;
-  };
+  address: AddressInfo;
 };
 
 @Injectable()
