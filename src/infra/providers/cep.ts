@@ -16,14 +16,28 @@ export class CepProvider {
   constructor(private readonly http: HttpService) {}
 
   private mapper = (o: AddressInfoProps): AddressInfo => {
-    const [prefix_logradouro, ...logradouro] = o.street.split(' ');
+    const { logradouro, prefix_logradouro } = (() => {
+      if (o.street) {
+        const [prefix_logradouro, ...logradouro] = o.street.split(' ');
+
+        return {
+          logradouro: logradouro.join(' '),
+          prefix_logradouro,
+        };
+      }
+
+      return {
+        logradouro: o.street ?? '',
+        prefix_logradouro: '',
+      };
+    })();
 
     return {
       uf: o.state,
       cep: o.cep,
-      bairro: o.neighborhood,
+      bairro: o.neighborhood ?? '',
       municipio: o.city,
-      logradouro: logradouro.join(' '),
+      logradouro,
       prefix_logradouro,
       numero: '',
       complemento: '',
