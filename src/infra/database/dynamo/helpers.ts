@@ -1,6 +1,6 @@
 import { AttributeValue, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { DynamoItem, Pagination } from './type';
+import { DynamoItem, Pagination } from './types';
 
 type FilterOperator = 'equals' | 'contains' | 'begins_with';
 
@@ -10,6 +10,12 @@ type BuildFilterParams = {
   attributeName: string;
   attributeValue: string | number | boolean;
   nestedPath?: string;
+};
+
+type BuildUpdateParams = {
+  UpdateExpression: string;
+  ExpressionAttributeNames: Record<string, string>;
+  ExpressionAttributeValues: Record<string, unknown>;
 };
 
 abstract class ExtraRepositoryMethods {
@@ -61,6 +67,52 @@ abstract class ExtraRepositoryMethods {
       ...expressionAttributeValues,
       [`:${attributeName}`]: attributeValue,
     });
+  }
+
+  protected buildAttributeNamesAndValues = (payload: Record<string, any>) => {
+    const keys = Object.keys(payload);
+
+    const ExpressionAttributeNames = keys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [`#${key}`]: key,
+      }),
+      {},
+    );
+
+    const ExpressionAttributeValues = keys.reduce(
+      (acc, key) => ({
+        ...acc,
+        [`:${key}`]: payload[key],
+      }),
+      {},
+    );
+
+    return { ExpressionAttributeNames, ExpressionAttributeValues };
+  };
+
+  protected buildUpdate<T>(payload: T, nestedPath?: string): BuildUpdateParams {
+    const keys = Object.keys(payload);
+
+    const UpdateExpression = `SET ${keys
+      .map((key) => `${nestedPath ? `${nestedPath}.` : ''}#${key} = :${key}`)
+      .toString()}`;
+
+    const { ExpressionAttributeNames, ExpressionAttributeValues } =
+      this.buildAttributeNamesAndValues(payload);
+
+    ExpressionAttributeNames['#Updated'] = 'Updated';
+    ExpressionAttributeValues[':Updated'] = new Date().toISOString();
+
+    return {
+      UpdateExpression: `${UpdateExpression}, #Updated = :Updated`,
+      ExpressionAttributeNames,
+      ExpressionAttributeValues: marshall(ExpressionAttributeValues, {
+        convertEmptyValues: true,
+        removeUndefinedValues: true,
+        convertClassInstanceToMap: true,
+      }),
+    };
   }
 }
 
