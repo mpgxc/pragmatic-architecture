@@ -14,8 +14,7 @@ export enum SortOrder {
   DESC = 'DESC',
 }
 
-const CURRENT_PAGE_REGEX =
-  /^\{"PK":"[^"]+","SK":"[^"]+"(?:,"Category":"[0-9]+")?\}$/;
+const CURRENT_PAGE_REGEX = /^\{"PK":"[^"]+","SK":"[^"]+"\}$/;
 
 export class QueryParams {
   @ApiProperty({
