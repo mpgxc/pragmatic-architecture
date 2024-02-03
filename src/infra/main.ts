@@ -1,3 +1,5 @@
+import fastifyCsrf from '@fastify/csrf-protection';
+import helmet from '@fastify/helmet';
 import { LoggerService } from '@mpgxc/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +9,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 import { InfraModule } from './infra.module';
 
 (async () => {
@@ -32,6 +35,9 @@ import { InfraModule } from './infra.module';
       validateCustomDecorators: true,
     }),
   );
+
+  await app.register(helmet);
+  await app.register(fastifyCsrf);
 
   app.useLogger(logger);
   app.setGlobalPrefix('api');
