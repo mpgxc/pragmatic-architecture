@@ -1,4 +1,6 @@
-type Optional<T> = T | null | undefined;
+export type Optional<T> = T | null | undefined;
+
+export type OptionalPromise<T> = Promise<Optional<T>>;
 
 type Result<T, E> = Err<E> | Ok<T>;
 

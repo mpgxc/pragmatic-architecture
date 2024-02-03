@@ -4,7 +4,10 @@ export type Entity<Content = any> = {
   Content: Content;
   Updated?: string;
   Created: string;
-  Status?: string;
+  /**
+   * Por padrão, o status é 'Ativo'
+   */
+  Status?: 'Ativo' | 'Inativo'; //'Excluído';
 };
 
 export type AddressInfo = {

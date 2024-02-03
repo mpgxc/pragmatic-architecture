@@ -1,6 +1,7 @@
 import { AttributeValue, QueryCommandInput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { DynamoItem, Pagination } from './types';
+import { Entity } from '@common/types';
+import { Pagination } from './types';
 
 type FilterOperator = 'equals' | 'contains' | 'begins_with';
 
@@ -21,7 +22,7 @@ type BuildUpdateParams = {
 abstract class ExtraRepositoryMethods {
   protected dynamoItemMapper = <T extends object>(
     item: Record<string, AttributeValue>,
-  ): DynamoItem<T> => unmarshall(item) as DynamoItem<T>;
+  ): Entity<T> => unmarshall(item) as Entity<T>;
 
   protected extractCurrentPage = (
     LastEvaluatedKey: Record<string, AttributeValue>,
