@@ -63,5 +63,5 @@ import { InfraModule } from './infra.module';
 
   await app.listen(+config.getOrThrow('PORT'), '0.0.0.0');
 
-  console.log(`Application running 🚀: ${await app.getUrl()}/api`);
+  logger.debug(`Application running 🚀: ${await app.getUrl()}/api/docs`);
 })();
