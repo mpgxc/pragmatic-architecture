@@ -15,7 +15,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
 import { DynamoDBClientService } from './dynamo.service';
-import { DynamoCommand } from './type';
+import { DynamoCommand } from './types';
 
 @Injectable()
 export class DynamoRepositoryService {
@@ -98,7 +98,10 @@ export class DynamoRepositoryService {
     params: DynamoCommand<UpdateItemInput>,
   ): Promise<UpdateItemCommandOutput> {
     return this.client.send(
-      new UpdateItemCommand({ TableName: this.TableName, ...params }),
+      new UpdateItemCommand({
+        ...params,
+        TableName: this.TableName,
+      }),
     );
   }
 }

@@ -1,4 +1,4 @@
-import { Pagination } from '@infra/database/dynamo/type';
+import { Pagination } from '@infra/database/dynamo/types';
 import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 import { Injectable } from '@nestjs/common';
 

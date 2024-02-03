@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 
-import { marshall } from '@aws-sdk/util-dynamodb';
 import { QueryInput, UpdateItemInput } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -11,7 +11,7 @@ import { Establishment } from '@domain/establishment/establishment';
 
 import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
-import { DynamoCommand, Pagination } from '../dynamo/type';
+import { DynamoCommand, Pagination } from '../dynamo/types';
 
 @Injectable()
 export class EstablishmentRepository extends ExtraRepositoryMethods {
