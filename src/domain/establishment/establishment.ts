@@ -22,4 +22,6 @@ export type Establishment = {
     open: string;
     close: string;
   };
+  partnerId?: string;
+  establishmentId?: string;
 };
