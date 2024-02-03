@@ -2,18 +2,25 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Establishment } from '@domain/establishment/establishment';
 import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
+import { UUID } from 'node:crypto';
 
 @Injectable()
 export class UpdateEstablishment {
   constructor(private readonly repository: EstablishmentRepository) {}
 
-  async execute(id: string, props: Partial<Establishment>) {
-    const establishment = await this.repository.get(id);
+  async execute(
+    partnerId: UUID,
+    establishmentId: UUID,
+    props: Partial<Establishment>,
+  ) {
+    const establishment = await this.repository
+      .bind(partnerId)
+      .get(establishmentId);
 
     if (!establishment) {
       throw new NotFoundException('Establishment not found');
     }
 
-    await this.repository.update(id, props);
+    await this.repository.bind(partnerId).update(establishmentId, props);
   }
 }
