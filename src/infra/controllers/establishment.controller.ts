@@ -21,6 +21,7 @@ import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
+import { UUID } from 'node:crypto';
 import {
   EstablishmentOutput,
   EstablishmentRegister,
@@ -29,7 +30,7 @@ import {
 import { QueryParams } from './validators/query';
 
 @ApiTags('Establishments')
-@Controller('establishments')
+@Controller('partner/:partnerId/establishment')
 export class EstablishmentController {
   constructor(
     @LoggerInject(EstablishmentController.name)
@@ -45,21 +46,37 @@ export class EstablishmentController {
   @ApiCreatedResponse({
     description: 'The establishment has been successfully registered.',
   })
-  async create(@Body() payload: EstablishmentRegister): Promise<void> {
+  async create(
+    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Body() payload: EstablishmentRegister,
+  ): Promise<void> {
     this.logger.log('create > params', {
       payload,
     });
 
-    await this.registerEstablishment.execute(payload);
+    await this.registerEstablishment.execute(partnerId, payload);
 
-    this.logger.log('create > success');
+    this.logger.log('create  > success');
   }
 
-  @Get('/:id')
+  @Get('/:establishmentId')
   @ApiOkResponse({ type: EstablishmentOutput })
   @HttpCode(HttpStatus.OK)
-  async getById(@Param('id') id: string) {
-    const output = await this.getEstablishment.execute(id);
+  async retrieve(
+    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('establishmentId') establishmentId: UUID,
+  ) {
+    this.logger.log('retrieve > params', {
+      partnerId,
+      establishmentId,
+    });
+
+    const output = await this.getEstablishment.execute(
+      partnerId,
+      establishmentId,
+    );
+
+    this.logger.log('retrieve > success', output);
 
     return output;
   }
@@ -69,27 +86,43 @@ export class EstablishmentController {
     type: [EstablishmentOutput],
   })
   @HttpCode(HttpStatus.OK)
-  async list(@Query() { limit, sort, page }: QueryParams) {
-    const output = await this.listEstablishments.execute({
-      pagination: { limit, sort, page },
+  async list(
+    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Query() { limit, sort, page }: QueryParams,
+  ) {
+    this.logger.log('update > params', { partnerId });
+
+    const output = await this.listEstablishments.execute(partnerId, {
+      pagination: {
+        limit,
+        sort,
+        page,
+      },
     });
+
+    this.logger.log('update > success', output);
 
     return output;
   }
 
-  @Put('/:id')
+  @Put('/:establishmentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'The establishment has been successfully updated',
   })
   async update(
     @Body() payload: EstablishmentUpdate,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
   ) {
-    this.logger.log('update establishment', { id });
+    this.logger.log('update > params ', {
+      partnerId,
+      establishmentId,
+      payload,
+    });
 
-    await this.updateEstablishment.execute(id, payload);
+    await this.updateEstablishment.execute(partnerId, establishmentId, payload);
 
-    this.logger.log('finish update establisment');
+    this.logger.log('update > success');
   }
 }
