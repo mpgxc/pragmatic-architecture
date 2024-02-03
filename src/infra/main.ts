@@ -55,7 +55,10 @@ import { InfraModule } from './infra.module';
         .build(),
     );
 
-    SwaggerModule.setup('/api/docs', app, document);
+    /**
+     * Apenas um experimento
+     */
+    module.exports = SwaggerModule.setup('/api/docs', app, document);
   }
 
   await app.listen(+config.getOrThrow('PORT'), '0.0.0.0');
