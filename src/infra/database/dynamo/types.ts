@@ -1,10 +1,6 @@
-export type DynamoItem<T = any> = {
-  PK: string;
-  SK: string;
-  Content: T;
-  Created: string;
-  Status: string;
-};
+import { Entity } from '@common/types';
+
+export type DynamoItem<T> = Entity<T>;
 
 export type Pagination = {
   sort: 'ASC' | 'DESC';

@@ -11,8 +11,6 @@ export class ListEstablishments {
   constructor(private readonly repository: EstablishmentRepository) {}
 
   async execute(input: ListEstablishmentsInput) {
-    const establishment = await this.repository.list(input.pagination);
-
-    return establishment;
+    return this.repository.list(input.pagination);
   }
 }

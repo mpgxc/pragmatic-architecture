@@ -1,14 +1,10 @@
-import { randomUUID } from 'crypto';
-
-import { QueryInput, UpdateItemInput } from '@aws-sdk/client-dynamodb';
+import { QueryInput } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-
 import { entityFactory } from '@common/helpers';
 import { Establishment } from '@domain/establishment/establishment';
-
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
 import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
 import { DynamoCommand, Pagination } from '../dynamo/types';
@@ -52,7 +48,7 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     });
   }
 
-  async getEstablishment(id: string) {
+  async get(id: string) {
     const { Item } = await this.client.find({
       Key: marshall({
         PK: `ESTABLISHMENT#${id}`,
@@ -66,7 +62,8 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
   async list(pagination: Pagination) {
     const { sort, limit, page } = pagination || {};
 
-    const commandQuery: DynamoCommand<QueryInput> = {
+    const command: DynamoCommand<QueryInput> = {
+      IndexName: 'SK-index',
       KeyConditionExpression: '#SK = :SK',
       ExpressionAttributeNames: {
         '#PK': 'PK',
@@ -77,7 +74,6 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
         ':PK': 'ESTABLISHMENT#',
         ':SK': `PARTNER#${this.partnerId}`,
       }),
-      IndexName: 'SK-index',
     };
 
     const { Limit, ExclusiveStartKey, ScanIndexForward } = this.applyPagination(
@@ -89,7 +85,7 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     );
 
     const { Items, LastEvaluatedKey, Count } = await this.client.query({
-      ...commandQuery,
+      ...command,
       Limit,
       ScanIndexForward,
       ExclusiveStartKey,
@@ -103,26 +99,28 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     };
   }
 
-  async update(props: Establishment) {
-    const commandInput: DynamoCommand<UpdateItemInput> = {
+  async update(id: string, { name, phone, owner }: Partial<Establishment>) {
+    const {
+      UpdateExpression,
+      ExpressionAttributeNames,
+      ExpressionAttributeValues,
+    } = this.buildUpdate<Partial<Establishment>>({
+      path: 'Content',
+      payload: {
+        name,
+        phone,
+        owner,
+      },
+    });
+
+    await this.client.update({
       Key: marshall({
-        PK: `ESTABLISHMENT#${props.id}`,
+        PK: `ESTABLISHMENT#${id}`,
         SK: `PARTNER#${this.partnerId}`,
       }),
-      ExpressionAttributeNames: {
-        '#Name': 'name',
-        '#Phone': 'phone',
-        '#Owner': 'owner',
-      },
-      UpdateExpression:
-        'set Content.#Name = :name, Content.#Phone = :phone, Content.#Owner = :owner',
-      ExpressionAttributeValues: marshall({
-        ':name': props.name,
-        ':phone': props.phone,
-        ':owner': props.owner,
-      }),
-    };
-
-    await this.client.update(commandInput);
+      UpdateExpression,
+      ExpressionAttributeNames,
+      ExpressionAttributeValues,
+    });
   }
 }

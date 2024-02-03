@@ -7,8 +7,6 @@ export class GetEstablishment {
   constructor(private readonly repository: EstablishmentRepository) {}
 
   async execute(id: string) {
-    const establishment = await this.repository.getEstablishment(id);
-
-    return establishment;
+    return this.repository.get(id);
   }
 }

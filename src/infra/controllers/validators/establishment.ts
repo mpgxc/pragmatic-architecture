@@ -77,7 +77,7 @@ export class EstablishmentHours {
   close: string;
 }
 
-export class EstablishmentInput implements Establishment {
+export class EstablishmentRegister implements Establishment {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({
@@ -138,6 +138,29 @@ export class EstablishmentInput implements Establishment {
     required: false,
   })
   description?: string;
+}
+
+export class EstablishmentUpdate implements Partial<Establishment> {
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    required: true,
+  })
+  owner: string;
+
+  @IsPhoneNumber('BR')
+  @IsNotEmpty()
+  @ApiProperty({
+    required: true,
+  })
+  phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({
+    required: true,
+  })
+  name: string;
 }
 
 export class EstablishmentOutput implements Establishment {

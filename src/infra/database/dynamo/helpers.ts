@@ -15,7 +15,7 @@ type BuildFilterParams = {
 type BuildUpdateParams = {
   UpdateExpression: string;
   ExpressionAttributeNames: Record<string, string>;
-  ExpressionAttributeValues: Record<string, unknown>;
+  ExpressionAttributeValues: Record<string, AttributeValue>;
 };
 
 abstract class ExtraRepositoryMethods {
@@ -91,11 +91,17 @@ abstract class ExtraRepositoryMethods {
     return { ExpressionAttributeNames, ExpressionAttributeValues };
   };
 
-  protected buildUpdate<T>(payload: T, nestedPath?: string): BuildUpdateParams {
+  protected buildUpdate<T>({
+    path,
+    payload,
+  }: {
+    path?: string;
+    payload: T;
+  }): BuildUpdateParams {
     const keys = Object.keys(payload);
 
     const UpdateExpression = `SET ${keys
-      .map((key) => `${nestedPath ? `${nestedPath}.` : ''}#${key} = :${key}`)
+      .map((key) => `${path ? `${path}.` : ''}#${key} = :${key}`)
       .toString()}`;
 
     const { ExpressionAttributeNames, ExpressionAttributeValues } =

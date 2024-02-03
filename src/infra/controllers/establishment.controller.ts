@@ -6,20 +6,27 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import {
-  EstablishmentInput,
-  EstablishmentOutput,
-} from './validators/establishment';
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
-import { QueryParams } from './validators/query';
+import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
+import {
+  EstablishmentOutput,
+  EstablishmentRegister,
+  EstablishmentUpdate,
+} from './validators/establishment';
+import { QueryParams } from './validators/query';
 
 @ApiTags('Establishments')
 @Controller('establishments')
@@ -27,10 +34,10 @@ export class EstablishmentController {
   constructor(
     @LoggerInject(EstablishmentController.name)
     private readonly logger: LoggerService,
-    private readonly registerEstablishment: RegisterEstablishment,
     private readonly getEstablishment: GetEstablishment,
     private readonly listEstablishments: ListEstablishments,
     private readonly updateEstablishment: UpdateEstablishment,
+    private readonly registerEstablishment: RegisterEstablishment,
   ) {}
 
   @Post()
@@ -38,7 +45,7 @@ export class EstablishmentController {
   @ApiCreatedResponse({
     description: 'The establishment has been successfully registered.',
   })
-  async create(@Body() payload: EstablishmentInput): Promise<void> {
+  async create(@Body() payload: EstablishmentRegister): Promise<void> {
     this.logger.log('create > params', {
       payload,
     });
@@ -50,15 +57,18 @@ export class EstablishmentController {
 
   @Get('/:id')
   @ApiOkResponse({ type: EstablishmentOutput })
-  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
   async getById(@Param('id') id: string) {
     const output = await this.getEstablishment.execute(id);
 
     return output;
   }
 
-  @Get('')
-  @ApiOkResponse({ type: EstablishmentOutput, isArray: true })
+  @Get()
+  @ApiOkResponse({
+    type: [EstablishmentOutput],
+  })
+  @HttpCode(HttpStatus.OK)
   async list(@Query() { limit, sort, page }: QueryParams) {
     const output = await this.listEstablishments.execute({
       pagination: { limit, sort, page },
@@ -69,13 +79,16 @@ export class EstablishmentController {
 
   @Put('/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiCreatedResponse({
+  @ApiNoContentResponse({
     description: 'The establishment has been successfully updated',
   })
-  async update(@Param('id') id: string, @Body() body: EstablishmentInput) {
+  async update(
+    @Body() payload: EstablishmentUpdate,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     this.logger.log('update establishment', { id });
 
-    await this.updateEstablishment.execute({ ...body, id });
+    await this.updateEstablishment.execute(id, payload);
 
     this.logger.log('finish update establisment');
   }
