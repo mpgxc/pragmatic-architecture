@@ -1,45 +1,53 @@
 import { QueryInput } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
+import { OptionalPromise } from '@common/logic';
+import { Entity, OutputList, Repository } from '@common/types';
 import { Establishment } from '@domain/establishment/establishment';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { randomUUID } from 'crypto';
+import { UUID, randomUUID } from 'node:crypto';
 import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
 import { DynamoCommand, Pagination } from '../dynamo/types';
 
 @Injectable()
-export class EstablishmentRepository extends ExtraRepositoryMethods {
-  // Deve ser recebido via parâmetro
-  private partnerId = '34d5b513-aea9-47c7-b501-96307f81f0b7';
-
+export class EstablishmentRepository {
   constructor(
     private readonly config: ConfigService,
     private readonly client: DynamoRepositoryService,
   ) {
-    super();
     this.client.setTableName(this.config.getOrThrow('AWS_DYNAMODB_TABLE'));
   }
 
+  bind = (partnerId: UUID) =>
+    new RepositoryActions(this.config, this.client, partnerId);
+}
+
+class RepositoryActions
+  extends ExtraRepositoryMethods
+  implements Repository<Establishment>
+{
+  constructor(
+    private readonly config: ConfigService, // 👈 Será utilizado na proxíma rc
+    private readonly client: DynamoRepositoryService,
+    private readonly partnerId: UUID,
+  ) {
+    super();
+  }
+
   async create(props: Establishment) {
-    const id = randomUUID();
+    const establishmentId = randomUUID();
 
     const content = entityFactory<Establishment>({
-      PK: `ESTABLISHMENT#${id}`,
+      PK: `ESTABLISHMENT#${establishmentId}`,
       SK: `PARTNER#${this.partnerId}`,
-      Content: { ...props, id },
-      Status: 'Ativo',
+      Content: {
+        ...props,
+        partnerId: this.partnerId,
+        establishmentId,
+      },
     });
-
-    /*
-    // Talvez
-    const addressContent = entityFactory({
-      PK: content.PK,
-      SK: 'ADDRESS',
-      Content: { ...address },
-    });
-    */
 
     await this.client.create({
       Item: marshall(content, {
@@ -48,74 +56,71 @@ export class EstablishmentRepository extends ExtraRepositoryMethods {
     });
   }
 
-  async get(id: string) {
+  async get(establishmentId: UUID): OptionalPromise<Entity<Establishment>> {
     const { Item } = await this.client.find({
       Key: marshall({
-        PK: `ESTABLISHMENT#${id}`,
+        PK: `ESTABLISHMENT#${establishmentId}`,
         SK: `PARTNER#${this.partnerId}`,
       }),
     });
 
-    return Item ? this.dynamoItemMapper(Item) : undefined;
+    return Item ? this.dynamoItemMapper<Establishment>(Item) : undefined;
   }
 
-  async list(pagination: Pagination) {
-    const { sort, limit, page } = pagination || {};
+  async list(pagination: Pagination): Promise<OutputList<Establishment>> {
+    {
+      const { sort, limit, page } = pagination || {};
 
-    const command: DynamoCommand<QueryInput> = {
-      IndexName: 'SK-index',
-      KeyConditionExpression: '#SK = :SK',
-      ExpressionAttributeNames: {
-        '#PK': 'PK',
-        '#SK': 'SK',
-      },
-      FilterExpression: 'begins_with(#PK, :PK)',
-      ExpressionAttributeValues: marshall({
-        ':PK': 'ESTABLISHMENT#',
-        ':SK': `PARTNER#${this.partnerId}`,
-      }),
-    };
+      const command: DynamoCommand<QueryInput> = {
+        IndexName: 'SK-index',
+        KeyConditionExpression: '#SK = :SK',
+        ExpressionAttributeNames: {
+          '#PK': 'PK',
+          '#SK': 'SK',
+        },
+        FilterExpression: 'begins_with(#PK, :PK)',
+        ExpressionAttributeValues: marshall({
+          ':PK': 'ESTABLISHMENT#',
+          ':SK': `PARTNER#${this.partnerId}`,
+        }),
+      };
 
-    const { Limit, ExclusiveStartKey, ScanIndexForward } = this.applyPagination(
-      {
-        sort,
-        limit,
-        page,
-      },
-    );
+      const { Limit, ExclusiveStartKey, ScanIndexForward } =
+        this.applyPagination({
+          sort,
+          limit,
+          page,
+        });
 
-    const { Items, LastEvaluatedKey, Count } = await this.client.query({
-      ...command,
-      Limit,
-      ScanIndexForward,
-      ExclusiveStartKey,
-      ReturnConsumedCapacity: 'TOTAL',
-    });
+      const { Items, LastEvaluatedKey, Count } = await this.client.query({
+        ...command,
+        Limit,
+        ScanIndexForward,
+        ExclusiveStartKey,
+        ReturnConsumedCapacity: 'TOTAL',
+      });
 
-    return {
-      Items: Items.map((item) => this.dynamoItemMapper<Establishment>(item)),
-      LastEvaluatedKey: this.extractCurrentPage(LastEvaluatedKey) || '',
-      Count,
-    };
+      return {
+        Items: Items.map((item) => this.dynamoItemMapper<Establishment>(item)),
+        LastEvaluatedKey: this.extractCurrentPage(LastEvaluatedKey) || '',
+        Count,
+      };
+    }
   }
 
-  async update(id: string, { name, phone, owner }: Partial<Establishment>) {
+  async update(establishmentId: UUID, payload: Partial<Establishment>) {
     const {
       UpdateExpression,
       ExpressionAttributeNames,
       ExpressionAttributeValues,
     } = this.buildUpdate<Partial<Establishment>>({
       path: 'Content',
-      payload: {
-        name,
-        phone,
-        owner,
-      },
+      payload,
     });
 
     await this.client.update({
       Key: marshall({
-        PK: `ESTABLISHMENT#${id}`,
+        PK: `ESTABLISHMENT#${establishmentId}`,
         SK: `PARTNER#${this.partnerId}`,
       }),
       UpdateExpression,
