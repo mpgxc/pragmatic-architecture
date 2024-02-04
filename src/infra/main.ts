@@ -1,27 +1,13 @@
-import fastifyCsrf from '@fastify/csrf-protection';
-import helmet from '@fastify/helmet';
 import { LoggerService } from '@mpgxc/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
+import { NestApplication, NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
+import helmet from 'helmet';
 import { InfraModule } from './infra.module';
 
 (async () => {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    InfraModule,
-    new FastifyAdapter({
-      logger: process.env.NODE_ENV === 'prd',
-    }),
-    {
-      cors: true,
-    },
-  );
+  const app = await NestFactory.create<NestApplication>(InfraModule);
 
   const logger = await app.resolve(LoggerService);
   const config = await app.resolve(ConfigService);
@@ -36,8 +22,8 @@ import { InfraModule } from './infra.module';
     }),
   );
 
-  await app.register(helmet);
-  await app.register(fastifyCsrf);
+  app.enableCors();
+  app.use(helmet());
 
   app.useLogger(logger);
   app.setGlobalPrefix('api');
@@ -58,7 +44,7 @@ import { InfraModule } from './infra.module';
     /**
      * Apenas um experimento
      */
-    module.exports = SwaggerModule.setup('/api/docs', app, document);
+    SwaggerModule.setup('/api/docs', app, document);
   }
 
   await app.listen(+config.getOrThrow('PORT'), '0.0.0.0');
