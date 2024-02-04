@@ -20,7 +20,7 @@ export class EstablishmentRepository {
     this.client.setTableName(this.config.getOrThrow('AWS_DYNAMODB_TABLE'));
   }
 
-  bind = (partnerId: UUID) =>
+  bind = (partnerId: UUID): Repository<Establishment> =>
     new RepositoryActions(this.config, this.client, partnerId);
 }
 

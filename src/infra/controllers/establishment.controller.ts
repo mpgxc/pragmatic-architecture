@@ -47,7 +47,7 @@ export class EstablishmentController {
     description: 'The establishment has been successfully registered.',
   })
   async create(
-    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('partnerId') partnerId: UUID,
     @Body() payload: EstablishmentRegister,
   ): Promise<void> {
     this.logger.log('create > params', {
@@ -63,7 +63,7 @@ export class EstablishmentController {
   @ApiOkResponse({ type: EstablishmentOutput })
   @HttpCode(HttpStatus.OK)
   async retrieve(
-    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('partnerId') partnerId: UUID,
     @Param('establishmentId') establishmentId: UUID,
   ) {
     this.logger.log('retrieve > params', {
@@ -87,10 +87,10 @@ export class EstablishmentController {
   })
   @HttpCode(HttpStatus.OK)
   async list(
-    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('partnerId') partnerId: UUID,
     @Query() { limit, sort, page }: QueryParams,
   ) {
-    this.logger.log('update > params', { partnerId });
+    this.logger.log('list > params', { partnerId });
 
     const output = await this.listEstablishments.execute(partnerId, {
       pagination: {
@@ -100,7 +100,7 @@ export class EstablishmentController {
       },
     });
 
-    this.logger.log('update > success', output);
+    this.logger.log('list > success', output);
 
     return output;
   }
@@ -112,7 +112,7 @@ export class EstablishmentController {
   })
   async update(
     @Body() payload: EstablishmentUpdate,
-    @Param('partnerId', ParseUUIDPipe) partnerId: UUID,
+    @Param('partnerId') partnerId: UUID,
     @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
   ) {
     this.logger.log('update > params ', {

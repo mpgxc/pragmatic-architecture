@@ -13,7 +13,7 @@ export class ThirdPartyController {
 
   @Get('cnpj/:cnpj')
   async getCnpj(@Param('cnpj') cnpj: string) {
-    return this.cnpjProvider.getCnpj(cnpj) as any;
+    return this.cnpjProvider.getCnpj(cnpj);
   }
 
   @Get('cep/:cep')
