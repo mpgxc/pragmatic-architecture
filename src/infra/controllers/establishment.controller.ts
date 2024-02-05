@@ -7,11 +7,14 @@ import {
   HttpStatus,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Put,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiConsumes,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -28,6 +31,11 @@ import {
   EstablishmentUpdate,
 } from './validators/establishment';
 import { QueryParams } from './validators/query';
+import {
+  UploadFileInterceptor,
+  UploadedFile,
+  UploadedFileOutput,
+} from '@infra/interceptors/upload-file.interceptor';
 
 @ApiTags('Establishments')
 @Controller('partner/:partnerId/establishment')
@@ -124,5 +132,15 @@ export class EstablishmentController {
     await this.updateEstablishment.execute(partnerId, establishmentId, payload);
 
     this.logger.log('update > success');
+  }
+
+  @Patch('/:establishmentId/picture')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(UploadFileInterceptor('file', 'establishment-picture'))
+  @ApiNoContentResponse({
+    description: 'The establishment has been successfully updated',
+  })
+  async patch(@UploadedFile() file: UploadedFileOutput) {
+    return { file: file.filename };
   }
 }
