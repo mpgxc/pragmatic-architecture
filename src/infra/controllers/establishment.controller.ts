@@ -14,7 +14,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
-  ApiConsumes,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -32,10 +31,13 @@ import {
 } from './validators/establishment';
 import { QueryParams } from './validators/query';
 import {
+  FileTypes,
   UploadFileInterceptor,
   UploadedFile,
-  UploadedFileOutput,
 } from '@infra/interceptors/upload-file.interceptor';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
+import { ApiFileUpload } from './validators/common';
 
 @ApiTags('Establishments')
 @Controller('partner/:partnerId/establishment')
@@ -47,6 +49,7 @@ export class EstablishmentController {
     private readonly listEstablishments: ListEstablishments,
     private readonly updateEstablishment: UpdateEstablishment,
     private readonly registerEstablishment: RegisterEstablishment,
+    private readonly updateEstablishmentPicture: UpdateEstablishmentPicture,
   ) {}
 
   @Post()
@@ -135,12 +138,34 @@ export class EstablishmentController {
   }
 
   @Patch('/:establishmentId/picture')
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(UploadFileInterceptor('file', 'establishment-picture'))
+  @ApiFileUpload('picture')
+  @UseInterceptors(
+    FileInterceptor('picture'),
+    UploadFileInterceptor({
+      fileTypes: [FileTypes.PNG, FileTypes.JPEG, FileTypes.JPG],
+      prefix: 'establishment-picture',
+    }),
+  )
   @ApiNoContentResponse({
     description: 'The establishment has been successfully updated',
   })
-  async patch(@UploadedFile() file: UploadedFileOutput) {
-    return { file: file.filename };
+  async patch(
+    @Param('partnerId') partnerId: UUID,
+    @Param('establishmentId') establishmentId: UUID,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    this.logger.log('Upadte picture > params', {
+      partnerId,
+      establishmentId,
+      filename: file.filename,
+    });
+
+    await this.updateEstablishmentPicture.execute({
+      establishmentId,
+      partnerId,
+      filename: file.filename,
+    });
+
+    this.logger.log('Update picture > success');
   }
 }

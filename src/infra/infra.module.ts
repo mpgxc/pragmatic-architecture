@@ -12,6 +12,7 @@ import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
+import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ProvidersModule } from './providers/providers.module';
     GetEstablishment,
     ListEstablishments,
     UpdateEstablishment,
+    UpdateEstablishmentPicture,
   ],
   controllers: [
     EstablishmentController,

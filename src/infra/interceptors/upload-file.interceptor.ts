@@ -1,5 +1,5 @@
-import { IFileProvider, UploadFileOptions } from '@infra/providers/file';
 import {
+  BadRequestException,
   CallHandler,
   ExecutionContext,
   Inject,
@@ -9,10 +9,14 @@ import {
   mixin,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { MultipartFile } from '@fastify/multipart';
 import { randomUUID } from 'crypto';
-
-export type UploadedFileOutput = MultipartFile;
+import { extname } from 'path';
+import {
+  IStorageProvider,
+  UploadFileOptions,
+} from '@infra/providers/storage/storage.provider';
+import { StorageProvider } from '@infra/providers/storage/storage.factory';
+import { LoggerInject, LoggerService } from '@mpgxc/logger';
 
 export const UploadedFile = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
@@ -22,34 +26,62 @@ export const UploadedFile = createParamDecorator(
   },
 );
 
+export enum FileTypes {
+  PNG = '.png',
+  JPEG = '.jpeg',
+  JPG = '.jpg',
+  PDF = '.pdf',
+}
+
+type UploadFileInterceptorProps = {
+  fileTypes: FileTypes[];
+  prefix: string;
+};
+
 export function UploadFileInterceptor(
-  names: string,
-  prefix: string,
+  props: UploadFileInterceptorProps,
 ): Type<NestInterceptor> {
   class MixinUploadFileInterceptor implements NestInterceptor {
     constructor(
-      @Inject('FileProvider') private readonly fileProvider: IFileProvider,
+      @LoggerInject(MixinUploadFileInterceptor.name)
+      private readonly logger: LoggerService,
+      @Inject(StorageProvider)
+      private readonly storageProvider: IStorageProvider,
     ) {}
 
     async intercept(
       context: ExecutionContext,
       next: CallHandler<any>,
     ): Promise<Observable<any>> {
-      const req = context.switchToHttp().getRequest();
+      try {
+        const req = context.switchToHttp().getRequest();
 
-      req.uploadedFile = {};
+        req.uploadedFile = {};
 
-      const file: MultipartFile = await req.file();
+        const file: Express.Multer.File = req.file;
 
-      const uploadFileOptions: UploadFileOptions = {
-        file,
-        filename: `${randomUUID()}-${file.filename}`,
-        folderName: prefix,
-      };
+        const ext = extname(file.originalname);
+        const fileTypes: string[] = Object.values(props.fileTypes);
 
-      await this.fileProvider.upload(uploadFileOptions);
+        if (!fileTypes.includes(ext)) {
+          throw new BadRequestException('Invalid file for this resource');
+        }
 
-      req.uploadedFile = { ...uploadFileOptions };
+        const filename = `${randomUUID()}${ext}`;
+
+        const uploadFileOptions: UploadFileOptions = {
+          file,
+          filename,
+          folderName: props.prefix,
+        };
+
+        await this.storageProvider.upload(uploadFileOptions);
+
+        req.uploadedFile = { ...uploadFileOptions };
+      } catch (error) {
+        this.logger.error('Error on upload file interceptor', { error });
+        throw new BadRequestException(error);
+      }
 
       return next.handle();
     }

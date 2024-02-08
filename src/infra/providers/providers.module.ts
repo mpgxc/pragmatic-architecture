@@ -4,12 +4,9 @@ import { HttpModule } from '@nestjs/axios';
 import { CepProvider } from './cep';
 import { CnpjProvider } from './cnpj';
 import { FirebaseProvider } from './firebase';
-import { ConfigService } from '@nestjs/config';
-import {
-  FirebaseStorageProvider,
-  LocalStorageProvider,
-  StorageFactory,
-} from './file';
+import { LocalStorageProvider } from './storage/local-storage.provider';
+import { FirebaseStorageProvider } from './storage/firebase-storage.provider';
+import { storageFactoryProvider } from './storage/storage.factory';
 
 @Module({
   imports: [HttpModule],
@@ -19,23 +16,8 @@ import {
     FirebaseProvider,
     LocalStorageProvider,
     FirebaseStorageProvider,
-    {
-      provide: 'FileProvider',
-      useFactory: (
-        firebaseStorageProvider: FirebaseStorageProvider,
-        localStorageProvider: LocalStorageProvider,
-        config: ConfigService,
-      ) => {
-        const storageFactory: StorageFactory = {
-          local: localStorageProvider,
-          firebase: firebaseStorageProvider,
-        };
-
-        return storageFactory[config.get('STORAGE')] || localStorageProvider;
-      },
-      inject: [FirebaseStorageProvider, LocalStorageProvider, ConfigService],
-    },
+    storageFactoryProvider,
   ],
-  exports: [CepProvider, CnpjProvider, 'FileProvider'],
+  exports: [CepProvider, CnpjProvider, storageFactoryProvider],
 })
 export class ProvidersModule {}
