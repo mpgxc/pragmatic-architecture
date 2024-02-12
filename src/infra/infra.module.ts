@@ -45,6 +45,8 @@ import { SpotController } from './controllers/spot.controller';
 })
 export class InfraModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(PartnerMiddleware).forRoutes(EstablishmentController);
+    consumer
+      .apply(PartnerMiddleware)
+      .forRoutes(EstablishmentController, SpotController);
   }
 }
