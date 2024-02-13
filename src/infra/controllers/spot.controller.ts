@@ -37,7 +37,15 @@ export class SpotController {
       payload,
     });
 
-    await this.registerSpot.execute({ ...payload, partnerId, establishmentId });
+    const output = await this.registerSpot.execute({
+      ...payload,
+      partnerId,
+      establishmentId,
+    });
+
+    if (!output.isOk) {
+      this.logger.error('create spot > fail', { error: output.value });
+    }
 
     this.logger.log('create spot  > success');
   }
