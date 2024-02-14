@@ -1,6 +1,7 @@
-import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
-import { Injectable } from '@nestjs/common';
 import { UUID } from 'node:crypto';
+import { Injectable } from '@nestjs/common';
+
+import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 
 @Injectable()
 export class GetEstablishment {

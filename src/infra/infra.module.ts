@@ -13,6 +13,8 @@ import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
 import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
+import { RegisterSpot } from '@usecases/spots/register-spot';
+import { SpotController } from './controllers/spot.controller';
 
 @Module({
   imports: [
@@ -32,15 +34,19 @@ import { UpdateEstablishmentPicture } from '@usecases/establishments/update-esta
     ListEstablishments,
     UpdateEstablishment,
     UpdateEstablishmentPicture,
+    RegisterSpot,
   ],
   controllers: [
     EstablishmentController,
     HealthCheckController,
     ThirdPartyController,
+    SpotController,
   ],
 })
 export class InfraModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(PartnerMiddleware).forRoutes(EstablishmentController);
+    consumer
+      .apply(PartnerMiddleware)
+      .forRoutes(EstablishmentController, SpotController);
   }
 }
