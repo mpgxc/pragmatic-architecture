@@ -10,9 +10,9 @@ export type OutputList<E> = {
 
 export interface Repository<E, Filters = any> {
   create(props: E): Promise<void>;
-  get(establishmentId: UUID): OptionalPromise<Entity<E>>;
+  get(id: UUID): OptionalPromise<Entity<E>>;
   list(pagination: Pagination, filters?: Filters): Promise<OutputList<E>>;
-  update(establishmentId: UUID, props: Partial<E>): Promise<void>;
+  update(id: UUID, payload: Partial<E>): Promise<void>;
 }
 
 export type Entity<Content = any> = {

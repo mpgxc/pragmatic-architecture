@@ -52,7 +52,7 @@ export class RegisterSpot {
       partnerId: input.partnerId,
     };
 
-    await this.repository.create(spot);
+    await this.repository.bind(input.establishmentId).create(spot);
 
     return Ok();
   }

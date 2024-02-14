@@ -15,6 +15,8 @@ import { ProvidersModule } from './providers/providers.module';
 import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { SpotController } from './controllers/spot.controller';
+import { GetSpot } from '@usecases/spots/get-spot';
+import { ListSpots } from '@usecases/spots/list-spots';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { SpotController } from './controllers/spot.controller';
     UpdateEstablishment,
     UpdateEstablishmentPicture,
     RegisterSpot,
+    GetSpot,
+    ListSpots,
   ],
   controllers: [
     EstablishmentController,
