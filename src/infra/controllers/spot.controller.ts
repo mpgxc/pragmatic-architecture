@@ -61,6 +61,7 @@ export class SpotController {
 
     if (!output.isOk) {
       this.logger.error('create spot > fail', { error: output.value });
+      throw output.value;
     }
 
     this.logger.log('create spot  > success');
@@ -79,6 +80,11 @@ export class SpotController {
     });
 
     const output = await this.getSpot.execute({ establishmentId, spotId });
+
+    if (!output.isOk) {
+      this.logger.error('retrieve spot > fail', { error: output.value });
+      throw output.value;
+    }
 
     this.logger.log('retrieve spot > success', output.value);
 
@@ -108,6 +114,11 @@ export class SpotController {
       },
     });
 
+    if (!output.isOk) {
+      this.logger.error('retrieve spot > fail', { error: output.value });
+      throw output.value;
+    }
+
     this.logger.log('list spots > success', output);
 
     return output.value;
@@ -129,12 +140,17 @@ export class SpotController {
       spotId,
     });
 
-    await this.updateSpot.execute({
+    const output = await this.updateSpot.execute({
       modality: payload.modality,
       name: payload.name,
       establishmentId,
       spotId,
     });
+
+    if (!output.isOk) {
+      this.logger.error('retrieve spot > fail', { error: output.value });
+      throw output.value;
+    }
 
     this.logger.log('update spot > success');
   }
