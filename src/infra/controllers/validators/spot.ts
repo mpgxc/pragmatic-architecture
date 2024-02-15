@@ -69,3 +69,13 @@ export class SpotRegister {
   @Type(() => WeekDaysRentSettings)
   rentSettings: WeekDaysRentSettings[];
 }
+
+export class SpotUpdate {
+  @ApiProperty({ example: 'Quadra D' })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: 'Society' })
+  @IsString()
+  modality: string;
+}

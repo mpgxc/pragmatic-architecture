@@ -1,6 +1,11 @@
 import { UUID } from 'node:crypto';
 
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoggerService } from '@mpgxc/logger';
 import {
   Body,
@@ -9,16 +14,19 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseUUIDPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 
-import { SpotRegister } from './validators/spot';
+import { SpotRegister, SpotUpdate } from './validators/spot';
 
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { GetSpot } from '@usecases/spots/get-spot';
 import { QueryParams } from './validators/query';
 import { ListSpots } from '@usecases/spots/list-spots';
+import { UpdateSpot } from '@usecases/spots/update-spot';
 
 @ApiTags('Spots')
 @Controller('partner/:partnerId/establishment/:establishmentId/spots')
@@ -28,6 +36,7 @@ export class SpotController {
     private readonly registerSpot: RegisterSpot,
     private readonly getSpot: GetSpot,
     private readonly listSpots: ListSpots,
+    private readonly updateSpot: UpdateSpot,
   ) {}
 
   @Post()
@@ -61,14 +70,12 @@ export class SpotController {
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
   async retrieve(
-    @Param('spotId') spotId: UUID,
+    @Param('spotId', ParseUUIDPipe) spotId: UUID,
     @Param('establishmentId') establishmentId: UUID,
-    @Param('partnerId') partnerId: UUID,
   ) {
     this.logger.log('retrieve spot > params', {
       spotId,
       establishmentId,
-      partnerId,
     });
 
     const output = await this.getSpot.execute({ establishmentId, spotId });
@@ -82,11 +89,15 @@ export class SpotController {
   @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
   async list(
-    @Param('partnerId') partnerId: UUID,
-    @Param('establishmentId') establishmentId: UUID,
+    @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
     @Query() { limit, sort, page }: QueryParams,
   ) {
-    this.logger.log('list spots > params', { partnerId });
+    this.logger.log('list spots > params', {
+      establishmentId,
+      limit,
+      sort,
+      page,
+    });
 
     const output = await this.listSpots.execute({
       establishmentId,
@@ -99,6 +110,32 @@ export class SpotController {
 
     this.logger.log('list spots > success', output);
 
-    return output;
+    return output.value;
+  }
+
+  @Put('/:spotId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    description: 'The establishment has been successfully updated',
+  })
+  async update(
+    @Body() payload: SpotUpdate,
+    @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
+    @Param('spotId', ParseUUIDPipe) spotId: UUID,
+  ) {
+    this.logger.log('update spot > params ', {
+      establishmentId,
+      payload,
+      spotId,
+    });
+
+    await this.updateSpot.execute({
+      modality: payload.modality,
+      name: payload.name,
+      establishmentId,
+      spotId,
+    });
+
+    this.logger.log('update spot > success');
   }
 }

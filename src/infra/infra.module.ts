@@ -17,6 +17,7 @@ import { RegisterSpot } from '@usecases/spots/register-spot';
 import { SpotController } from './controllers/spot.controller';
 import { GetSpot } from '@usecases/spots/get-spot';
 import { ListSpots } from '@usecases/spots/list-spots';
+import { UpdateSpot } from '@usecases/spots/update-spot';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ListSpots } from '@usecases/spots/list-spots';
     RegisterSpot,
     GetSpot,
     ListSpots,
+    UpdateSpot,
   ],
   controllers: [
     EstablishmentController,

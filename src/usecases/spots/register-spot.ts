@@ -32,7 +32,7 @@ export class RegisterSpot {
   constructor(private readonly repository: SpotRepository) {}
 
   async execute(input: RegisterSpotInput) {
-    const rentSettings: RentSettings = input.rentSettings.reduce(
+    const rentSettings: RentSettings = input.rentSettings?.reduce(
       (acc, setting) => {
         acc[`weekday_${setting.weekday}`] = {
           available: setting.available,
