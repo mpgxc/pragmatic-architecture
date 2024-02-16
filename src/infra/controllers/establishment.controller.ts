@@ -77,7 +77,7 @@ export class EstablishmentController {
     @Param('partnerId') partnerId: UUID,
     @Param('establishmentId') establishmentId: UUID,
   ) {
-    this.logger.log('retrieve > params', {
+    this.logger.log('retrieve establishment > params', {
       partnerId,
       establishmentId,
     });
@@ -87,9 +87,11 @@ export class EstablishmentController {
       establishmentId,
     );
 
-    this.logger.log('retrieve > success', output);
+    if (!output.isOk) throw output.value;
 
-    return output;
+    this.logger.log('retrieve establishment > success', output.value);
+
+    return output.value;
   }
 
   @Get()

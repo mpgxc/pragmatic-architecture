@@ -23,4 +23,8 @@ export class LocalStorageProvider implements IStorageProvider {
       this.logger.log('Error on remove file from local storage');
     }
   }
+
+  getUrl(filename: string): string {
+    return filename;
+  }
 }

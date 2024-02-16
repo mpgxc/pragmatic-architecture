@@ -67,12 +67,11 @@ export function UploadFileInterceptor(
           throw new BadRequestException('Invalid file for this resource');
         }
 
-        const filename = `${randomUUID()}${ext}`;
+        const filename = `${props.prefix}/${randomUUID()}${ext}`;
 
         const uploadFileOptions: UploadFileOptions = {
           file,
           filename,
-          folderName: props.prefix,
         };
 
         await this.storageProvider.upload(uploadFileOptions);
