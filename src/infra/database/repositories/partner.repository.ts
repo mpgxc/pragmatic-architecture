@@ -41,6 +41,7 @@ export class PartnerRepository
     await this.client.create({
       Item: marshall(content, {
         convertClassInstanceToMap: true,
+        removeUndefinedValues: true,
       }),
     });
   }

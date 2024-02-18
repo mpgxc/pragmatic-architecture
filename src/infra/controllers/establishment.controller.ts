@@ -1,3 +1,8 @@
+import {
+  FileTypes,
+  UploadFileInterceptor,
+  UploadedFile,
+} from '@infra/interceptors/upload-file.interceptor';
 import { LoggerInject, LoggerService } from '@mpgxc/logger';
 import {
   Body,
@@ -13,6 +18,7 @@ import {
   Query,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
@@ -23,21 +29,15 @@ import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
+import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
 import { UUID } from 'node:crypto';
+import { ApiFileUpload } from './validators/common';
 import {
   EstablishmentOutput,
   EstablishmentRegister,
   EstablishmentUpdate,
 } from './validators/establishment';
 import { QueryParams } from './validators/query';
-import {
-  FileTypes,
-  UploadFileInterceptor,
-  UploadedFile,
-} from '@infra/interceptors/upload-file.interceptor';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
-import { ApiFileUpload } from './validators/common';
 
 @ApiTags('Establishments')
 @Controller('partner/:partnerId/establishment')

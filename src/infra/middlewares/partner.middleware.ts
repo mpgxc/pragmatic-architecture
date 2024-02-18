@@ -26,7 +26,7 @@ export class PartnerMiddleware implements NestMiddleware {
       throw new NotFoundException('Partner not found');
     }
 
-    request.partner = partner;
+    request.partner = partner.Content;
 
     return next();
   }

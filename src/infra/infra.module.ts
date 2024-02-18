@@ -6,18 +6,18 @@ import { GetEstablishment } from '@usecases/establishments/get-establishment';
 import { ListEstablishments } from '@usecases/establishments/list-establishments';
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
+import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
+import { GetSpot } from '@usecases/spots/get-spot';
+import { ListSpots } from '@usecases/spots/list-spots';
+import { RegisterSpot } from '@usecases/spots/register-spot';
+import { UpdateSpot } from '@usecases/spots/update-spot';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { HealthCheckController } from './controllers/health.controller';
+import { SpotController } from './controllers/spot.controller';
 import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
-import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
-import { RegisterSpot } from '@usecases/spots/register-spot';
-import { SpotController } from './controllers/spot.controller';
-import { GetSpot } from '@usecases/spots/get-spot';
-import { ListSpots } from '@usecases/spots/list-spots';
-import { UpdateSpot } from '@usecases/spots/update-spot';
 
 @Module({
   imports: [
