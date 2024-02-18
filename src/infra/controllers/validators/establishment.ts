@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsNotEmptyObject,
   IsOptional,
   IsPhoneNumber,
   IsString,
@@ -107,6 +108,7 @@ export class EstablishmentRegister implements Establishment {
     each: true,
     always: true,
   })
+  @IsNotEmptyObject()
   address: EstablishmentAddress;
 
   @IsEmail()
@@ -131,6 +133,7 @@ export class EstablishmentRegister implements Establishment {
     each: true,
     always: true,
   })
+  @IsNotEmptyObject()
   hours: EstablishmentHours;
 
   @IsString()
