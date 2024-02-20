@@ -11,7 +11,7 @@ export class FirebaseStorageProvider implements IStorageProvider {
     const bucket = this.firebase.getBucket();
 
     await new Promise((resolve, reject) => {
-      const uploadFile = bucket.file(`${input.folderName}/${input.filename}`);
+      const uploadFile = bucket.file(`${input.filename}`);
 
       const stream = uploadFile.createWriteStream({
         metadata: {
@@ -38,5 +38,10 @@ export class FirebaseStorageProvider implements IStorageProvider {
     const bucket = this.firebase.getBucket();
 
     await bucket.file(`${prefix}/${filename}`).delete({ ignoreNotFound: true });
+  }
+
+  getUrl(filename: string): string {
+    const [prefix, file] = filename.split('/');
+    return `https://firebasestorage.googleapis.com/v0/b/uzze-delivery.appspot.com/o/${prefix}%2F${file}?alt=media`;
   }
 }

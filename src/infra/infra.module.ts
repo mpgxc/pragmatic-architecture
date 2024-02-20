@@ -18,6 +18,8 @@ import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
+import { RegisterPartner } from '@usecases/partner/register-partner';
+import { PartnerController } from './controllers/partner.controller';
 
 @Module({
   imports: [
@@ -32,21 +34,26 @@ import { ProvidersModule } from './providers/providers.module';
     ProvidersModule,
   ],
   providers: [
+    // Establishment
     RegisterEstablishment,
     GetEstablishment,
     ListEstablishments,
     UpdateEstablishment,
     UpdateEstablishmentPicture,
+    // Spot
     RegisterSpot,
     GetSpot,
     ListSpots,
     UpdateSpot,
+    // Partner
+    RegisterPartner,
   ],
   controllers: [
     EstablishmentController,
     HealthCheckController,
     ThirdPartyController,
     SpotController,
+    PartnerController,
   ],
 })
 export class InfraModule implements NestModule {

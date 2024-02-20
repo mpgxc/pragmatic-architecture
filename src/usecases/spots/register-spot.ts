@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 import { RentSettings, Spot } from '@domain/spot/spot';
-import { Ok } from '@common/logic';
+import { Result } from '@common/logic';
 
 type Hour = {
   isPremium: boolean;
@@ -54,6 +54,6 @@ export class RegisterSpot {
 
     await this.repository.bind(input.establishmentId).create(spot);
 
-    return Ok();
+    return Result.Ok();
   }
 }

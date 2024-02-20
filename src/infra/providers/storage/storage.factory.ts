@@ -1,4 +1,4 @@
-import { Provider } from '@nestjs/common';
+import { Inject, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { FirebaseStorageProvider } from './firebase-storage.provider';
@@ -15,6 +15,8 @@ enum Storage {
 }
 
 export type StorageFactory = Record<Storage, StorageProvider>;
+
+export const InjectStorage = () => Inject(StorageProvider);
 
 const storageFactoryProvider: Provider = {
   provide: StorageProvider,
