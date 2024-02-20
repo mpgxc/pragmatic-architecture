@@ -1,8 +1,9 @@
-import { UUID } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { UUID } from 'node:crypto';
 
+import { Result } from '@common/logic';
+import { Spot } from '@domain/spot/spot';
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
-import { Ok } from '@common/logic';
 
 type GetSpotInput = {
   establishmentId: UUID;
@@ -13,13 +14,16 @@ type GetSpotInput = {
 export class GetSpot {
   constructor(private readonly repository: SpotRepository) {}
 
-  async execute({ establishmentId, spotId }: GetSpotInput) {
-    const spot = await this.repository.bind(establishmentId).get(spotId);
+  async execute({
+    establishmentId,
+    spotId,
+  }: GetSpotInput): Promise<Result<Spot, NotFoundException>> {
+    const { Content } = await this.repository.bind(establishmentId).get(spotId);
 
-    if (!spot) {
-      throw new NotFoundException('Spot not found!');
+    if (!Content) {
+      return Result.Err(new NotFoundException('Spot not found'));
     }
 
-    return Ok(spot);
+    return Result.Ok(Content);
   }
 }
