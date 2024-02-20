@@ -1,36 +1,36 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as firebase from 'firebase-admin';
 
-import { ConfigService } from '@nestjs/config';
-
 @Injectable()
-export class FirebaseProvider implements OnModuleInit {
+export class FirebaseProvider {
   private readonly storage: firebase.storage.Storage;
-  private credentials: firebase.credential.Credential;
+  private configs: firebase.AppOptions = {};
 
   constructor(private readonly config: ConfigService) {
-    if (!firebase.apps.length) {
-      const configs = ['prd', 'hml'].includes(
-        this.config.getOrThrow('NODE_ENV'),
-      )
-        ? { credential: this.credentials }
-        : {};
+    if (this.shouldInitializeFirebase()) {
+      this.configs = {
+        credential: this.getCredentials(),
+      };
+    }
 
-      firebase.initializeApp(configs);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(this.configs);
     }
 
     this.storage = firebase.storage();
   }
 
-  onModuleInit() {
-    this.credentials = firebase.credential.cert({
+  private shouldInitializeFirebase = () =>
+    ['prd', 'hml'].includes(this.config.getOrThrow('NODE_ENV'));
+
+  private getCredentials = (): firebase.credential.Credential =>
+    firebase.credential.cert({
       privateKey: this.config.get('FIREBASE_PRIVATE_KEY'),
       projectId: this.config.get('FIREBASE_PROJECT_ID'),
       clientEmail: this.config.get('FIREBASE_CLIENT_EMAIL'),
     });
-  }
 
-  getBucket() {
-    return this.storage.bucket(this.config.get('FIREBASE_BUCKET_NAME'));
-  }
+  getBucket = () =>
+    this.storage.bucket(this.config.get('FIREBASE_BUCKET_NAME'));
 }
