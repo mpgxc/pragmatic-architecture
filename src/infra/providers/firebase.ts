@@ -1,10 +1,10 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as firebase from 'firebase-admin';
 
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class FirebaseProvider implements OnModuleDestroy {
+export class FirebaseProvider implements OnModuleInit {
   private readonly storage: firebase.storage.Storage;
   private credentials: firebase.credential.Credential;
 
@@ -22,7 +22,7 @@ export class FirebaseProvider implements OnModuleDestroy {
     this.storage = firebase.storage();
   }
 
-  onModuleDestroy() {
+  onModuleInit() {
     this.credentials = firebase.credential.cert({
       privateKey: this.config.get('FIREBASE_PRIVATE_KEY'),
       projectId: this.config.get('FIREBASE_PROJECT_ID'),
