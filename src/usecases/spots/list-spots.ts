@@ -2,7 +2,7 @@ import { UUID } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
-import { Err, Ok } from '@common/logic';
+import { Result } from '@common/logic';
 import { Pagination } from '@infra/database/dynamo/types';
 
 type ListSpotsInput = {
@@ -15,12 +15,14 @@ export class ListSpots {
   constructor(private readonly repository: SpotRepository) {}
 
   async execute({ establishmentId, pagination }: ListSpotsInput) {
-    const spot = await this.repository.bind(establishmentId).list(pagination);
+    const { Items } = await this.repository
+      .bind(establishmentId)
+      .list(pagination);
 
-    if (!spot.Items.length) {
-      return Err(new NotFoundException('Spot not found!'));
+    if (!Items.length) {
+      return Result.Err(new NotFoundException('Spot not found!'));
     }
 
-    return Ok(spot);
+    return Result.Ok(Items);
   }
 }

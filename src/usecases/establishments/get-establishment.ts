@@ -6,7 +6,7 @@ import {
   InjectStorage,
   StorageProvider,
 } from '@infra/providers/storage/storage.factory';
-import { Err, Ok } from '@common/logic';
+import { Result } from '@common/logic';
 
 @Injectable()
 export class GetEstablishment {
@@ -21,12 +21,12 @@ export class GetEstablishment {
       .get(establishmentId);
 
     if (!establishment)
-      return Err(new NotFoundException('Estalbishment not found!'));
+      return Result.Err(new NotFoundException('Estalbishment not found!'));
 
     establishment.Content.pictures = establishment.Content.pictures.map(
       (picture) => this.storage.getUrl(picture),
     );
 
-    return Ok(establishment);
+    return Result.Ok(establishment);
   }
 }
