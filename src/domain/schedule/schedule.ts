@@ -8,7 +8,7 @@ type ScheduleLeader = {
   leaderName: string;
 };
 
-type StatusChange = {
+type StatusUpdate = {
   at: Date;
   status: ScheduleStatus;
   reason?: string;
@@ -28,10 +28,11 @@ type Schedule = {
   status: ScheduleStatus;
   starts: string;
   ends: string;
+  date: string;
   totalValue: number;
   spot: SpotSchedule;
   leader: ScheduleLeader;
-  statusChanges: StatusChange[];
+  statusUpdates: StatusUpdate[];
 };
 
 export { Schedule, ScheduleStatus };

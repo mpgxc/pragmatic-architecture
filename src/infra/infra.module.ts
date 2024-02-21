@@ -20,6 +20,8 @@ import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
 import { RegisterPartner } from '@usecases/partner/register-partner';
 import { PartnerController } from './controllers/partner.controller';
+import { CreateSchedule } from '@usecases/schedule/create-schedule';
+import { ScheduleController } from './controllers/schedule.controller';
 
 @Module({
   imports: [
@@ -47,6 +49,8 @@ import { PartnerController } from './controllers/partner.controller';
     UpdateSpot,
     // Partner
     RegisterPartner,
+    // Schedule
+    CreateSchedule,
   ],
   controllers: [
     EstablishmentController,
@@ -54,6 +58,7 @@ import { PartnerController } from './controllers/partner.controller';
     ThirdPartyController,
     SpotController,
     PartnerController,
+    ScheduleController,
   ],
 })
 export class InfraModule implements NestModule {
