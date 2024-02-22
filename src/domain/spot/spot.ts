@@ -25,7 +25,7 @@ export type RentSettings = Record<WeekDay, WeekDaysRentSettings>;
 export type Spot = {
   name: string;
   modality: string;
-  rentSettings?: RentSettings;
+  rentSettings?: WeekDaysRentSettings[];
   partnerId?: string;
   establishmentId?: string;
   spotId?: string;

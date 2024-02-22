@@ -1,5 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { RegisterSchedule } from '@usecases/schedule/register-schedule';
 
 @ApiTags('Schedules')
@@ -7,10 +7,11 @@ import { RegisterSchedule } from '@usecases/schedule/register-schedule';
 export class ScheduleController {
   constructor(private readonly registerSchedule: RegisterSchedule) {}
 
+  @HttpCode(HttpStatus.CREATED)
   @Post()
   async create(@Body() payload) {
-    console.log({ payload });
+    const result = await this.registerSchedule.execute(payload);
 
-    await this.registerSchedule.execute();
+    if (!result.isOk) throw result.value;
   }
 }

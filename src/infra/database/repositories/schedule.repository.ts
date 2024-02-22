@@ -9,7 +9,7 @@ import { OptionalPromise } from '@common/logic';
 import { DynamoCommand, Pagination } from '../dynamo/types';
 import { entityFactory } from '@common/helpers';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { QueryInput } from '@aws-sdk/client-dynamodb';
+import { QueryInput, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 
 @Injectable()
 export class ScheduleRepository {
@@ -43,6 +43,7 @@ export class RepositoryActions
     const content = entityFactory<Schedule>({
       PK: `SCHEDULE#${scheduleId}`,
       SK: `SPOT#${props.spotId}`,
+      Created: `${props.date}`,
       Content: {
         ...props,
         scheduleId,
@@ -103,5 +104,26 @@ export class RepositoryActions
 
   async update(id: UUID, payload: Partial<Schedule>): Promise<void> {
     console.log({ id, payload });
+  }
+
+  async getSchedulesByDate(date: string): Promise<Schedule[]> {
+    const command: DynamoCommand<QueryInput> = {
+      IndexName: 'SK-index',
+      KeyConditionExpression: '#SK = :SK',
+      ExpressionAttributeNames: {
+        '#PK': 'PK',
+        '#Created': 'Created',
+        '#SK': 'SK',
+      },
+      FilterExpression: 'begins_with(#PK, :PK) AND #Created = :Created',
+      ExpressionAttributeValues: marshall({
+        ':PK': 'SCHEDULE#',
+        ':Created': date,
+        ':SK': `SPOT#${this.spotId}`,
+      }),
+    };
+
+    const { Items } = await this.client.query(command);
+    return Items.map((item) => this.dynamoItemMapper<Schedule>(item).Content);
   }
 }
