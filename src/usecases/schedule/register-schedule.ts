@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 @Injectable()
-export class CreateSchedule {
+export class RegisterSchedule {
   constructor(private readonly repository: ScheduleRepository) {}
 
   async execute() {

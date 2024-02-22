@@ -1,16 +1,16 @@
-import { ApiTags } from '@nestjs/swagger';
 import { Body, Controller, Post } from '@nestjs/common';
-import { CreateSchedule } from '@usecases/schedule/create-schedule';
+import { ApiTags } from '@nestjs/swagger';
+import { RegisterSchedule } from '@usecases/schedule/register-schedule';
 
 @ApiTags('Schedules')
 @Controller('/partner/:partnerId/schedules')
 export class ScheduleController {
-  constructor(private readonly createSchedule: CreateSchedule) {}
+  constructor(private readonly registerSchedule: RegisterSchedule) {}
 
   @Post()
   async create(@Body() payload) {
     console.log({ payload });
 
-    await this.createSchedule.execute();
+    await this.registerSchedule.execute();
   }
 }
