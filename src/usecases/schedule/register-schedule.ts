@@ -1,30 +1,46 @@
-import { Result } from '@common/logic';
-import { ScheduleStatus } from '@domain/schedule/schedule';
-import { ScheduleRepository } from '@infra/database/repositories/schedule.repository';
+import { UUID } from 'crypto';
+import { getDay, isBefore } from 'date-fns';
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
   Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
-import { UUID } from 'crypto';
-import { differenceInHours, isBefore } from 'date-fns';
+
+import { Result } from '@common/logic';
+import { SpotRepository } from '@infra/database/repositories/spot.repository';
+import { ScheduleRepository } from '@infra/database/repositories/schedule.repository';
+
+import { ScheduleStatus } from '@domain/schedule/schedule';
 
 type CreateScheduleInput = {
   spotId: UUID;
   date: string;
   starts: string;
   ends: string;
+  establishmentId: UUID;
+  leader: {
+    leaderId: string;
+    leaderName: string;
+  };
 };
 
 @Injectable()
 export class RegisterSchedule {
-  constructor(private readonly repository: ScheduleRepository) {}
+  constructor(
+    private readonly repository: ScheduleRepository,
+    private readonly spotRepository: SpotRepository,
+  ) {}
 
   async execute(
     input: CreateScheduleInput,
-  ): Promise<Result<unknown, ConflictException>> {
+  ): Promise<Result<unknown, HttpException>> {
     const startsFullDate = new Date(`${input.date} ${input.starts}`);
     const endsFullDate = new Date(`${input.date} ${input.ends}`);
+
+    // TODO: verificar se o agendamento está sendo feito para data futura
 
     const startsBeforeEnds = isBefore(startsFullDate, endsFullDate);
 
@@ -35,17 +51,11 @@ export class RegisterSchedule {
     }
 
     //TODO: Verificar quantidade maxima de horas que pode alugar
-    const diffHours = differenceInHours(endsFullDate, startsFullDate);
-
-    console.log({ startsFullDate, endsFullDate, startsBeforeEnds, diffHours });
+    // const diffHours = differenceInHours(endsFullDate, startsFullDate);
 
     const schedulesAtDate = await this.repository
       .bind(input.spotId)
       .getSchedulesByDate(input.date);
-
-    if (!schedulesAtDate.length) {
-      console.log('no has schedules at', { date: input.date, schedulesAtDate });
-    }
 
     const hourAlreadyScheduled = schedulesAtDate.some(
       ({ starts, ends }) => starts === input.starts && ends === input.ends,
@@ -55,22 +65,56 @@ export class RegisterSchedule {
       return Result.Err(new ConflictException('This hour already scheduled'));
     }
 
-    console.log({ hourAlreadyScheduled });
+    const { Content: spot } = await this.spotRepository
+      .bind(input.establishmentId)
+      .get(input.spotId);
 
-    // await this.repository.bind('83edad6d-35f0-429c-b046-f33363bbd40e').create({
-    //   starts: '19:00',
-    //   ends: '20:00',
-    //   date: '2024-02-23',
-    //   leader: { leaderId: '123123', leaderName: 'Deusimar' },
-    //   partnerId: 'c48cb0b4-7927-4aee-addc-2f81b4e74314',
-    //   spot: { modality: 'poliesportiva', name: 'Quadra A' },
-    //   spotId: '83edad6d-35f0-429c-b046-f33363bbd40e',
-    //   status: ScheduleStatus.CREATED,
-    //   statusUpdates: [{ at: new Date(), status: ScheduleStatus.CREATED }],
-    //   totalValue: 100,
-    //   establishmentId: 'aaed57d1-0d65-4491-8ca0-f214fe8fc68a',
-    //   scheduleId: randomUUID(),
-    // });
+    if (!spot) {
+      return Result.Err(new NotFoundException('Spot not found'));
+    }
+
+    const weekday = getDay(startsFullDate);
+
+    const weekdaySpotSettings = spot.rentSettings.find(
+      (setting) => setting.weekday === weekday,
+    );
+
+    if (!weekdaySpotSettings.available) {
+      return Result.Err(
+        new UnprocessableEntityException('Weekday is not available do rent'),
+      );
+    }
+
+    const hourSetting = weekdaySpotSettings.hours.find(
+      ({ starts, ends }) => starts === input.starts && ends === input.ends,
+    );
+
+    if (!hourSetting)
+      return Result.Err(
+        new UnprocessableEntityException(
+          'Weekday settings not found with the provided starts and ends hours',
+        ),
+      );
+
+    if (!hourSetting.available) {
+      return Result.Err(
+        new UnprocessableEntityException('Hour is not available to rent'),
+      );
+    }
+
+    await this.repository.bind(input.spotId).create({
+      starts: input.starts,
+      ends: input.ends,
+      date: input.date,
+      leader: input.leader,
+      partnerId: spot.partnerId,
+      spot: { modality: spot.modality, name: spot.name },
+      spotId: input.spotId,
+      status: ScheduleStatus.CREATED,
+      statusUpdates: [{ at: new Date(), status: ScheduleStatus.CREATED }],
+      totalValue: hourSetting.price,
+      establishmentId: input.establishmentId,
+    });
 
     return Result.Ok();
   }

@@ -7,6 +7,7 @@ export type Hour = {
 };
 
 export type WeekDaysRentSettings = {
+  weekday: number;
   hours: Hour[];
   available: boolean;
 };
