@@ -102,7 +102,150 @@ export class RepositoryActions
     });
 
     return {
-      Items: Items.map((item) => this.dynamoItemMapper<Spot>(item)),
+      Items: [
+        {
+          Content: {
+            rentSettings: [
+              {
+                weekday: 0,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+              {
+                weekday: 1,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+              {
+                weekday: 2,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+              {
+                weekday: 3,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+              {
+                weekday: 4,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+              {
+                weekday: 5,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '18:00',
+                    price: 120,
+                    ends: '19:00',
+                  },
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '19:00',
+                    price: 120,
+                    ends: '20:00',
+                  },
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '20:00',
+                    price: 120,
+                    ends: '21:00',
+                  },
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '21:00',
+                    price: 120,
+                    ends: '22:00',
+                  },
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '22:00',
+                    price: 120,
+                    ends: '23:00',
+                  },
+                ],
+              },
+              {
+                weekday: 6,
+                available: true,
+                hours: [
+                  {
+                    available: true,
+                    isPremium: false,
+                    starts: '17:00',
+                    price: 120,
+                    ends: '18:00',
+                  },
+                ],
+              },
+            ],
+            name: 'Quadra A',
+            modality: 'Poliesportiva',
+            partnerId: '1b824640-69d7-4bcd-b2d0-18d40d19fc57',
+            spotId: '17b89b7a-a4dd-4224-ba5b-0d78f69e7de0',
+            establishmentId: '74f1f99d-cbf0-49d9-a404-aba0a091263a',
+          },
+          SK: 'ESTABLISHMENT#74f1f99d-cbf0-49d9-a404-aba0a091263a',
+          Updated: '2024-02-23T12:22:47.398Z',
+          Status: 'Ativo',
+          PK: 'SPOT#17b89b7a-a4dd-4224-ba5b-0d78f69e7de0',
+          Created: '2024-02-23T12:22:47.398Z',
+        },
+      ],
       LastEvaluatedKey: this.extractCurrentPage(LastEvaluatedKey) || '',
       Count,
     };

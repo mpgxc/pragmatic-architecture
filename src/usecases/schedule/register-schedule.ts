@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import { getDay, isBefore } from 'date-fns';
+import { getDay, isAfter, isBefore } from 'date-fns';
 import {
   BadRequestException,
   ConflictException,
@@ -40,13 +40,22 @@ export class RegisterSchedule {
     const startsFullDate = new Date(`${input.date} ${input.starts}`);
     const endsFullDate = new Date(`${input.date} ${input.ends}`);
 
-    // TODO: verificar se o agendamento está sendo feito para data futura
+    const now = new Date();
+    const startsAfterNow = isAfter(startsFullDate, now);
+
+    if (!startsAfterNow) {
+      return Result.Err(
+        new UnprocessableEntityException(
+          'Schedules can only be made for a time in the future',
+        ),
+      );
+    }
 
     const startsBeforeEnds = isBefore(startsFullDate, endsFullDate);
 
     if (!startsBeforeEnds) {
       return Result.Err(
-        new BadRequestException('Starts hour must be before ends hour'),
+        new BadRequestException('The starts hour must be before the end hour'),
       );
     }
 
@@ -57,6 +66,7 @@ export class RegisterSchedule {
       .bind(input.spotId)
       .getSchedulesByDate(input.date);
 
+    // TODO: Verificar possibilidade de um agendamento de duas horas
     const hourAlreadyScheduled = schedulesAtDate.some(
       ({ starts, ends }) => starts === input.starts && ends === input.ends,
     );
@@ -92,7 +102,7 @@ export class RegisterSchedule {
     if (!hourSetting)
       return Result.Err(
         new UnprocessableEntityException(
-          'Weekday settings not found with the provided starts and ends hours',
+          'Weekday settings not found with the provided starts and ends hours for this spot',
         ),
       );
 

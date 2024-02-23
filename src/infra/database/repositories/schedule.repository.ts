@@ -20,7 +20,7 @@ export class ScheduleRepository {
     this.client.setTableName(this.config.getOrThrow('AWS_DYNAMODB_TABLE'));
   }
 
-  bind = (spotId: UUID) =>
+  bind = (spotId?: UUID) =>
     new RepositoryActions(this.config, this.client, spotId);
 }
 
@@ -49,7 +49,6 @@ export class RepositoryActions
         scheduleId,
       },
     });
-    console.log({ content });
 
     await this.client.create({
       Item: marshall(content, { convertClassInstanceToMap: true }),
@@ -124,6 +123,29 @@ export class RepositoryActions
     };
 
     const { Items } = await this.client.query(command);
+    return Items.map((item) => this.dynamoItemMapper<Schedule>(item).Content);
+  }
+
+  async getSchedulesAtEstablishmentByDate(
+    date: string,
+    establishmentId: string,
+  ): Promise<Schedule[]> {
+    const command: DynamoCommand<ScanCommandInput> = {
+      ExpressionAttributeNames: {
+        '#PK': 'PK',
+        '#Created': 'Created',
+        '#EstablishmentId': 'establishmentId',
+      },
+      FilterExpression:
+        'begins_with(#PK, :PK) AND #Created = :Created AND Content.#EstablishmentId = :EstablishmentId',
+      ExpressionAttributeValues: marshall({
+        ':PK': 'SCHEDULE#',
+        ':Created': date,
+        ':EstablishmentId': establishmentId,
+      }),
+    };
+
+    const { Items } = await this.client.scan(command);
     return Items.map((item) => this.dynamoItemMapper<Schedule>(item).Content);
   }
 }

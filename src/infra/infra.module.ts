@@ -22,6 +22,7 @@ import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
+import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ProvidersModule } from './providers/providers.module';
     GetSpot,
     ListSpots,
     UpdateSpot,
+    GetSpotsAvailability,
     // Partner
     RegisterPartner,
     // Schedule
