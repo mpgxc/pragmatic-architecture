@@ -1,5 +1,5 @@
 import { UUID } from 'crypto';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 
 import { ScheduleRepository } from '@infra/database/repositories/schedule.repository';
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
@@ -11,6 +11,22 @@ type GetSpotsAvailabilityInput = {
   establishmentId: UUID;
 };
 
+type AvailabilityOutput = {
+  isRented: boolean;
+  isPremium: boolean;
+  starts: string;
+  ends: string;
+  price: number;
+  available: boolean;
+};
+
+type GetSpotsAvailabilityOutput = {
+  spotId: string;
+  name: string;
+  modality: string;
+  availability: AvailabilityOutput[];
+};
+
 @Injectable()
 export class GetSpotsAvailability {
   constructor(
@@ -18,7 +34,9 @@ export class GetSpotsAvailability {
     private readonly scheduleRepository: ScheduleRepository,
   ) {}
 
-  async execute(input: GetSpotsAvailabilityInput) {
+  async execute(
+    input: GetSpotsAvailabilityInput,
+  ): Promise<Result<GetSpotsAvailabilityOutput[], HttpException>> {
     const { Items: spots } = await this.spotRepository
       .bind(input.establishmentId)
       .list({ limit: 10, sort: 'ASC' });
