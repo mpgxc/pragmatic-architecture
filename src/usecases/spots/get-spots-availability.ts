@@ -4,7 +4,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { ScheduleRepository } from '@infra/database/repositories/schedule.repository';
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 import { Result } from '@common/logic';
-import { getDay, startOfDay, addDays } from 'date-fns';
+import { getDay, startOfDay, addDays, isAfter } from 'date-fns';
 
 type GetSpotsAvailabilityInput = {
   date: string;
@@ -56,15 +56,20 @@ export class GetSpotsAvailability {
       );
 
       const spotAvailability = spotWeekDay.hours.map((hour) => {
-        const alreadyRented = establishmentSchedules.some(
-          (schedule) =>
-            schedule.starts === hour.starts && schedule.ends === hour.ends,
-        );
+        const fullStartAtDate = new Date(`${input.date} ${hour.starts}`);
+        const now = new Date();
+        const startsAfterNow = isAfter(fullStartAtDate, now);
+        if (startsAfterNow) {
+          const alreadyRented = establishmentSchedules.some(
+            (schedule) =>
+              schedule.starts === hour.starts && schedule.ends === hour.ends,
+          );
 
-        return {
-          ...hour,
-          isRented: alreadyRented,
-        };
+          return {
+            ...hour,
+            isRented: alreadyRented,
+          };
+        }
       });
 
       return {
