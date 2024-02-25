@@ -75,7 +75,7 @@ export class RegisterSchedule {
       return Result.Err(new ConflictException('This hour already scheduled'));
     }
 
-    const { Content: spot } = await this.spotRepository
+    const spot = await this.spotRepository
       .bind(input.establishmentId)
       .get(input.spotId);
 
@@ -85,7 +85,7 @@ export class RegisterSchedule {
 
     const weekday = getDay(startsFullDate);
 
-    const weekdaySpotSettings = spot.rentSettings.find(
+    const weekdaySpotSettings = spot.Content.rentSettings.find(
       (setting) => setting.weekday === weekday,
     );
 
@@ -117,8 +117,8 @@ export class RegisterSchedule {
       ends: input.ends,
       date: input.date,
       leader: input.leader,
-      partnerId: spot.partnerId,
-      spot: { modality: spot.modality, name: spot.name },
+      partnerId: spot.Content.partnerId,
+      spot: { modality: spot.Content.modality, name: spot.Content.name },
       spotId: input.spotId,
       status: ScheduleStatus.CREATED,
       statusUpdates: [{ at: new Date(), status: ScheduleStatus.CREATED }],
