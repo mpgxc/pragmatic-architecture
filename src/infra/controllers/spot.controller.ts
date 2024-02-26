@@ -24,9 +24,10 @@ import { SpotRegister, SpotUpdate } from './validators/spot';
 
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { GetSpot } from '@usecases/spots/get-spot';
-import { QueryParams } from './validators/query';
+import { DateQueryParam, QueryParams } from './validators/query';
 import { ListSpots } from '@usecases/spots/list-spots';
 import { UpdateSpot } from '@usecases/spots/update-spot';
+import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
 
 @ApiTags('Spots')
 @Controller('partner/:partnerId/establishment/:establishmentId/spots')
@@ -37,6 +38,7 @@ export class SpotController {
     private readonly getSpot: GetSpot,
     private readonly listSpots: ListSpots,
     private readonly updateSpot: UpdateSpot,
+    private readonly getSpotsAvailability: GetSpotsAvailability,
   ) {}
 
   @Post()
@@ -153,5 +155,32 @@ export class SpotController {
     }
 
     this.logger.log('update spot > success');
+  }
+
+  // FIXME: Corrigir
+  @Get('/schedules/availability')
+  @ApiOkResponse()
+  @HttpCode(HttpStatus.OK)
+  async availability(
+    @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
+    @Query('date', DateQueryParam) date: string,
+  ) {
+    this.logger.log('list spots availability > params', { establishmentId });
+
+    const output = await this.getSpotsAvailability.execute({
+      establishmentId,
+      date,
+    });
+
+    if (!output.isOk) {
+      this.logger.error('retrieve spots availability > fail', {
+        error: output.value,
+      });
+      throw output.value;
+    }
+
+    this.logger.log('list spots availability > success', output);
+
+    return output.value;
   }
 }

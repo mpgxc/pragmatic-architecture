@@ -2,7 +2,7 @@ import { UUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
-import { RentSettings, Spot } from '@domain/spot/spot';
+import { Spot } from '@domain/spot/spot';
 import { Result } from '@common/logic';
 
 type Hour = {
@@ -32,20 +32,8 @@ export class RegisterSpot {
   constructor(private readonly repository: SpotRepository) {}
 
   async execute(input: RegisterSpotInput) {
-    const rentSettings: RentSettings = input.rentSettings?.reduce(
-      (acc, setting) => {
-        acc[`weekday_${setting.weekday}`] = {
-          available: setting.available,
-          hours: setting.hours,
-        };
-
-        return acc;
-      },
-      {},
-    ) as RentSettings;
-
     const spot: Spot = {
-      rentSettings: rentSettings,
+      rentSettings: input.rentSettings,
       modality: input.modality,
       name: input.name,
       establishmentId: input.establishmentId,

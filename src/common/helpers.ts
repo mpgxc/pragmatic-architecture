@@ -5,12 +5,11 @@ export const entityFactory = <T>({
   SK,
   Content,
   ...extra
-}: Omit<Entity<T>, 'Created'>): Entity<T> => ({
+}: Partial<Entity<T>>): Entity<T> => ({
   PK,
   SK,
   Content,
-  ...extra,
-  Created: new Date().toISOString(),
+  Created: extra.Created || new Date().toISOString(),
   Updated: extra.Updated || new Date().toISOString(),
   Status: 'Ativo',
 });

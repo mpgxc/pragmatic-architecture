@@ -15,14 +15,12 @@ export class ListSpots {
   constructor(private readonly repository: SpotRepository) {}
 
   async execute({ establishmentId, pagination }: ListSpotsInput) {
-    const { Items } = await this.repository
-      .bind(establishmentId)
-      .list(pagination);
+    const spots = await this.repository.bind(establishmentId).list(pagination);
 
-    if (!Items.length) {
+    if (!spots.Items.length) {
       return Result.Err(new NotFoundException('Spot not found!'));
     }
 
-    return Result.Ok(Items);
+    return Result.Ok(spots);
   }
 }

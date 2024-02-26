@@ -7,19 +7,22 @@ import { ListEstablishments } from '@usecases/establishments/list-establishments
 import { RegisterEstablishment } from '@usecases/establishments/register-establishment';
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
 import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
+import { RegisterPartner } from '@usecases/partner/register-partner';
+import { RegisterSchedule } from '@usecases/schedule/register-schedule';
 import { GetSpot } from '@usecases/spots/get-spot';
 import { ListSpots } from '@usecases/spots/list-spots';
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { UpdateSpot } from '@usecases/spots/update-spot';
 import { EstablishmentController } from './controllers/establishment.controller';
 import { HealthCheckController } from './controllers/health.controller';
+import { PartnerController } from './controllers/partner.controller';
+import { ScheduleController } from './controllers/schedule.controller';
 import { SpotController } from './controllers/spot.controller';
 import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
-import { RegisterPartner } from '@usecases/partner/register-partner';
-import { PartnerController } from './controllers/partner.controller';
+import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
 
 @Module({
   imports: [
@@ -45,8 +48,11 @@ import { PartnerController } from './controllers/partner.controller';
     GetSpot,
     ListSpots,
     UpdateSpot,
+    GetSpotsAvailability,
     // Partner
     RegisterPartner,
+    // Schedule
+    RegisterSchedule,
   ],
   controllers: [
     EstablishmentController,
@@ -54,6 +60,7 @@ import { PartnerController } from './controllers/partner.controller';
     ThirdPartyController,
     SpotController,
     PartnerController,
+    ScheduleController,
   ],
 })
 export class InfraModule implements NestModule {

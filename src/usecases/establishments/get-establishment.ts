@@ -16,15 +16,15 @@ export class GetEstablishment {
   ) {}
 
   async execute(partnerId: UUID, establishmentId: UUID) {
-    const establishment = await this.repository
+    const { Content: establishment } = await this.repository
       .bind(partnerId)
       .get(establishmentId);
 
     if (!establishment)
       return Result.Err(new NotFoundException('Estalbishment not found!'));
 
-    establishment.Content.pictures = establishment.Content.pictures.map(
-      (picture) => this.storage.getUrl(picture),
+    establishment.pictures = establishment.pictures.map((picture) =>
+      this.storage.getUrl(picture),
     );
 
     return Result.Ok(establishment);

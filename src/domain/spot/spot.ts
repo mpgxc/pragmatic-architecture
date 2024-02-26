@@ -7,6 +7,7 @@ export type Hour = {
 };
 
 export type WeekDaysRentSettings = {
+  weekday: number;
   hours: Hour[];
   available: boolean;
 };
@@ -25,7 +26,7 @@ export type RentSettings = Record<WeekDay, WeekDaysRentSettings>;
 export type Spot = {
   name: string;
   modality: string;
-  rentSettings?: RentSettings;
+  rentSettings?: WeekDaysRentSettings[];
   partnerId?: string;
   establishmentId?: string;
   spotId?: string;

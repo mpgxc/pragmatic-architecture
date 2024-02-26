@@ -8,6 +8,9 @@ import {
   QueryCommand,
   QueryCommandInput,
   QueryCommandOutput,
+  ScanCommand,
+  ScanCommandInput,
+  ScanCommandOutput,
   UpdateItemCommand,
   UpdateItemCommandOutput,
   UpdateItemInput,
@@ -99,6 +102,17 @@ export class DynamoRepositoryService {
   ): Promise<UpdateItemCommandOutput> {
     return this.client.send(
       new UpdateItemCommand({
+        ...params,
+        TableName: this.TableName,
+      }),
+    );
+  }
+
+  async scan(
+    params: DynamoCommand<ScanCommandInput>,
+  ): Promise<ScanCommandOutput> {
+    return this.client.send(
+      new ScanCommand({
         ...params,
         TableName: this.TableName,
       }),
