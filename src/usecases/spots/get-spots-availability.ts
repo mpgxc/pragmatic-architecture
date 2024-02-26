@@ -12,7 +12,7 @@ type GetSpotsAvailabilityInput = {
 };
 
 type AvailabilityOutput = {
-  isRented: boolean;
+  alreadyRented: boolean;
   isPremium: boolean;
   starts: string;
   ends: string;
@@ -61,14 +61,15 @@ export class GetSpotsAvailability {
         const now = new Date();
         const startsAfterNow = isAfter(fullStartAtDate, now);
 
-        const alreadyRented = establishmentSchedules.some(
-          (schedule) =>
-            schedule.starts === hour.starts && schedule.ends === hour.ends,
+        const alreadyRented = establishmentSchedules.some((schedule) =>
+          schedule.scheduleTimes.some(
+            ({ end, start }) => hour.starts === start && hour.ends === end,
+          ),
         );
 
         return {
           ...hour,
-          isRented: alreadyRented,
+          alreadyRented: alreadyRented,
           availableToSchedule: startsAfterNow,
         };
       });

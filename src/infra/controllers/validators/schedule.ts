@@ -5,6 +5,7 @@ import {
   ValidateNested,
   Matches,
   IsNotEmptyObject,
+  IsArray,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -23,6 +24,26 @@ class ScheduleLeader {
   })
   @IsUUID('4', { message: 'Invalid UUID format' })
   leaderId: string;
+}
+
+class ScheduleTime {
+  @ApiProperty({
+    example: '18:00',
+    description: 'Start time of the schedule in HH:mm format',
+  })
+  @Matches(TIME_REGEX, {
+    message: 'Invalid time format. Time should be in HH:mm format.',
+  })
+  start: string;
+
+  @ApiProperty({
+    example: '19:00',
+    description: 'End time of the schedule in HH:mm format',
+  })
+  @Matches(TIME_REGEX, {
+    message: 'Invalid time format. Time should be in HH:mm format.',
+  })
+  end: string;
 }
 
 export class CreateSchedule {
@@ -50,27 +71,15 @@ export class CreateSchedule {
   )
   date: string;
 
-  @ApiProperty({
-    example: '18:00',
-    description: 'Start time of the schedule in HH:mm format',
-  })
-  @Matches(TIME_REGEX, {
-    message: 'Invalid time format. Time should be in HH:mm format.',
-  })
-  starts: string;
-
-  @ApiProperty({
-    example: '19:00',
-    description: 'End time of the schedule in HH:mm format',
-  })
-  @Matches(TIME_REGEX, {
-    message: 'Invalid time format. Time should be in HH:mm format.',
-  })
-  ends: string;
-
   @ApiProperty({ type: ScheduleLeader, description: 'Leader information' })
   @Type(() => ScheduleLeader)
   @ValidateNested({ each: true, always: true })
   @IsNotEmptyObject()
   leader: ScheduleLeader;
+
+  @ApiProperty({ type: ScheduleLeader, description: 'Leader information' })
+  @Type(() => ScheduleTime)
+  @ValidateNested({ each: true, always: true })
+  @IsArray()
+  scheduleTimes: ScheduleTime[];
 }

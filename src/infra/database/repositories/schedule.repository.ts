@@ -43,7 +43,6 @@ export class RepositoryActions
     const content = entityFactory<Schedule>({
       PK: `SCHEDULE#${scheduleId}`,
       SK: `SPOT#${props.spotId}`,
-      Created: `${props.date}`,
       Content: {
         ...props,
         scheduleId,
@@ -133,14 +132,14 @@ export class RepositoryActions
     const command: DynamoCommand<ScanCommandInput> = {
       ExpressionAttributeNames: {
         '#PK': 'PK',
-        '#Created': 'Created',
+        '#Date': 'date',
         '#EstablishmentId': 'establishmentId',
       },
       FilterExpression:
-        'begins_with(#PK, :PK) AND #Created = :Created AND Content.#EstablishmentId = :EstablishmentId',
+        'begins_with(#PK, :PK) AND Content.#Date = :Date AND Content.#EstablishmentId = :EstablishmentId',
       ExpressionAttributeValues: marshall({
         ':PK': 'SCHEDULE#',
-        ':Created': date,
+        ':Date': date,
         ':EstablishmentId': establishmentId,
       }),
     };

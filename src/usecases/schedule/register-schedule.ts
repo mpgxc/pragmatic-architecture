@@ -1,7 +1,6 @@
 import { UUID } from 'crypto';
-import { getDay, isAfter, isBefore } from 'date-fns';
+import { differenceInDays, getDay, isAfter } from 'date-fns';
 import {
-  BadRequestException,
   ConflictException,
   HttpException,
   Injectable,
@@ -13,13 +12,22 @@ import { Result } from '@common/logic';
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 import { ScheduleRepository } from '@infra/database/repositories/schedule.repository';
 
-import { ScheduleStatus } from '@domain/schedule/schedule';
+import {
+  Schedule,
+  ScheduleStatus,
+  calculateNumberOfHours,
+  validateScheduleTimes,
+} from '@domain/schedule/schedule';
+
+type ScheduleTime = {
+  start: string;
+  end: string;
+};
 
 type CreateScheduleInput = {
   spotId: UUID;
+  scheduleTimes?: ScheduleTime[];
   date: string;
-  starts: string;
-  ends: string;
   establishmentId: UUID;
   leader: {
     leaderId: string;
@@ -37,8 +45,21 @@ export class RegisterSchedule {
   async execute(
     input: CreateScheduleInput,
   ): Promise<Result<unknown, HttpException>> {
-    const startsFullDate = new Date(`${input.date} ${input.starts}`);
-    const endsFullDate = new Date(`${input.date} ${input.ends}`);
+    // Ordena e valida os horários de agendamentos recebidos
+    const scheduleTimesAreValid = validateScheduleTimes(input.scheduleTimes);
+
+    if (!scheduleTimesAreValid.isValid) {
+      return Result.Err(
+        new UnprocessableEntityException(
+          'The provided times must be sequential',
+        ),
+      );
+    }
+
+    const [firstScheduleTime] = scheduleTimesAreValid.sortedScheduleTimes;
+    const startsFullDate = new Date(
+      `${input.date} $${firstScheduleTime.start}`,
+    );
 
     const now = new Date();
     const startsAfterNow = isAfter(startsFullDate, now);
@@ -51,28 +72,39 @@ export class RegisterSchedule {
       );
     }
 
-    const startsBeforeEnds = isBefore(startsFullDate, endsFullDate);
+    // Máximo de antecedência
+    // FIXME: Deixar dimamico por partner?!
+    const MAX_DAYS_BEFORE_SCHEDULE = 10;
+    const daysBetweenNowAndSchedule = differenceInDays(startsFullDate, now);
 
-    if (!startsBeforeEnds) {
+    if (daysBetweenNowAndSchedule > MAX_DAYS_BEFORE_SCHEDULE) {
       return Result.Err(
-        new BadRequestException('The starts hour must be before the end hour'),
+        new UnprocessableEntityException(
+          'It is only possible to make schedules a maximum of 10 days in advance',
+        ),
       );
     }
-
-    //TODO: Verificar quantidade maxima de horas que pode alugar
-    // const diffHours = differenceInHours(endsFullDate, startsFullDate);
 
     const schedulesAtDate = await this.repository
       .bind(input.spotId)
       .getSchedulesByDate(input.date);
 
-    // TODO: Verificar possibilidade de um agendamento de duas horas
-    const hourAlreadyScheduled = schedulesAtDate.some(
-      ({ starts, ends }) => starts === input.starts && ends === input.ends,
+    const scheduleTimes = scheduleTimesAreValid.sortedScheduleTimes;
+
+    const anyTimeAlreadyScheduled = schedulesAtDate.some((sechedule) =>
+      sechedule?.scheduleTimes?.some(({ end, start }) =>
+        scheduleTimes?.some(
+          (inputTime) => inputTime.end === end && inputTime.start === start,
+        ),
+      ),
     );
 
-    if (hourAlreadyScheduled) {
-      return Result.Err(new ConflictException('This hour already scheduled'));
+    if (anyTimeAlreadyScheduled) {
+      return Result.Err(
+        new ConflictException(
+          'Any of the times provided are already scheduled',
+        ),
+      );
     }
 
     const spot = await this.spotRepository
@@ -95,36 +127,49 @@ export class RegisterSchedule {
       );
     }
 
-    const hourSetting = weekdaySpotSettings.hours.find(
-      ({ starts, ends }) => starts === input.starts && ends === input.ends,
+    const spotTimesSettings = weekdaySpotSettings.hours.filter((time) =>
+      scheduleTimes.some(
+        ({ end, start }) =>
+          time.ends === end && time.starts === start && time.available,
+      ),
     );
 
-    if (!hourSetting)
+    if (
+      !spotTimesSettings.length ||
+      spotTimesSettings.length !== scheduleTimes.length
+    )
       return Result.Err(
         new UnprocessableEntityException(
           'Weekday settings not found with the provided starts and ends hours for this spot',
         ),
       );
 
-    if (!hourSetting.available) {
-      return Result.Err(
-        new UnprocessableEntityException('Hour is not available to rent'),
-      );
-    }
+    const numberOfHours = calculateNumberOfHours(scheduleTimes);
+    // Verificar se vai ser possível alugar po um máximo de horas.
+    // Talvez nao. Deixar aberto pra ser possível alugar o dia todo pra campeonatos e etc.
 
-    await this.repository.bind(input.spotId).create({
-      starts: input.starts,
-      ends: input.ends,
+    const totalValue = spotTimesSettings.reduce(
+      (value, setting) => value + setting.price,
+      0,
+    );
+
+    const schedule: Schedule = {
       date: input.date,
       leader: input.leader,
       partnerId: spot.Content.partnerId,
       spot: { modality: spot.Content.modality, name: spot.Content.name },
       spotId: input.spotId,
       status: ScheduleStatus.CREATED,
-      statusUpdates: [{ at: new Date(), status: ScheduleStatus.CREATED }],
-      totalValue: hourSetting.price,
+      statusUpdates: [
+        { at: now.toISOString(), status: ScheduleStatus.CREATED },
+      ],
+      totalValue,
       establishmentId: input.establishmentId,
-    });
+      scheduleTimes: input.scheduleTimes,
+      numberOfHours,
+    };
+
+    await this.repository.bind(input.spotId).create(schedule);
 
     return Result.Ok();
   }
