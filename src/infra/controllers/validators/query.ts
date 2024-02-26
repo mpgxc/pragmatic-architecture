@@ -8,6 +8,12 @@ import {
   Matches,
   Min,
 } from 'class-validator';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException,
+} from '@nestjs/common';
 
 export enum SortOrder {
   ASC = 'ASC',
@@ -48,4 +54,23 @@ export class QueryParams {
     message: 'Invalid current page, please use the correct format',
   })
   page?: string;
+}
+
+@Injectable()
+export class DateQueryParam implements PipeTransform {
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (metadata.type !== 'query' || metadata.data !== 'date') {
+      return value;
+    }
+
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!regex.test(value)) {
+      throw new BadRequestException(
+        'Invalid date format. Date should be in YYYY-MM-DD format.',
+      );
+    }
+
+    return value;
+  }
 }

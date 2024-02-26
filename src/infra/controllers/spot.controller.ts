@@ -24,7 +24,7 @@ import { SpotRegister, SpotUpdate } from './validators/spot';
 
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { GetSpot } from '@usecases/spots/get-spot';
-import { QueryParams } from './validators/query';
+import { DateQueryParam, QueryParams } from './validators/query';
 import { ListSpots } from '@usecases/spots/list-spots';
 import { UpdateSpot } from '@usecases/spots/update-spot';
 import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
@@ -163,7 +163,7 @@ export class SpotController {
   @HttpCode(HttpStatus.OK)
   async availability(
     @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
-    @Query('date') date: string,
+    @Query('date', DateQueryParam) date: string,
   ) {
     this.logger.log('list spots availability > params', { establishmentId });
 
