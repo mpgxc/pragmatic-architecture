@@ -15,18 +15,18 @@ export class PartnerMiddleware implements NestMiddleware {
   async use(request: Request, _: Response, next: NextFunction) {
     const partnerId = request.params?.['partnerId'] as UUID;
 
-    // await new ParseUUIDPipe().transform(partnerId, {
-    //   type: 'param',
-    //   data: partnerId,
-    // });
+    await new ParseUUIDPipe().transform(partnerId, {
+      type: 'param',
+      data: partnerId,
+    });
 
-    // const partner = await this.repository.get(partnerId);
+    const partner = await this.repository.get(partnerId);
 
-    // if (!partner) {
-    //   throw new NotFoundException('Partner not found');
-    // }
+    if (!partner) {
+      throw new NotFoundException('Partner not found');
+    }
 
-    // request.partner = partner.Content;
+    request.partner = partner.Content;
 
     return next();
   }

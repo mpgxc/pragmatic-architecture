@@ -57,9 +57,7 @@ export class RegisterSchedule {
     }
 
     const [firstScheduleTime] = scheduleTimesAreValid.sortedScheduleTimes;
-    const startsFullDate = new Date(
-      `${input.date} $${firstScheduleTime.start}`,
-    );
+    const startsFullDate = new Date(`${input.date} ${firstScheduleTime.start}`);
 
     const now = new Date();
     const startsAfterNow = isAfter(startsFullDate, now);

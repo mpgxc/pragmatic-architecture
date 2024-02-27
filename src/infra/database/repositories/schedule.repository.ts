@@ -110,13 +110,13 @@ export class RepositoryActions
       KeyConditionExpression: '#SK = :SK',
       ExpressionAttributeNames: {
         '#PK': 'PK',
-        '#Created': 'Created',
+        '#Date': 'date',
         '#SK': 'SK',
       },
-      FilterExpression: 'begins_with(#PK, :PK) AND #Created = :Created',
+      FilterExpression: 'begins_with(#PK, :PK) AND Content.#Date = :Date',
       ExpressionAttributeValues: marshall({
         ':PK': 'SCHEDULE#',
-        ':Created': date,
+        ':Date': date,
         ':SK': `SPOT#${this.spotId}`,
       }),
     };
