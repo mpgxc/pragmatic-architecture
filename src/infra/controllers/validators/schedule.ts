@@ -71,13 +71,17 @@ export class CreateSchedule {
   )
   date: string;
 
-  @ApiProperty({ type: ScheduleLeader, description: 'Leader information' })
+  @ApiProperty({ type: ScheduleLeader, description: 'Lider do agendamento' })
   @Type(() => ScheduleLeader)
   @ValidateNested({ each: true, always: true })
   @IsNotEmptyObject()
   leader: ScheduleLeader;
 
-  @ApiProperty({ type: ScheduleLeader, description: 'Leader information' })
+  @ApiProperty({
+    type: ScheduleTime,
+    description: 'Horário que seram agendados',
+    isArray: true,
+  })
   @Type(() => ScheduleTime)
   @ValidateNested({ each: true, always: true })
   @IsArray()

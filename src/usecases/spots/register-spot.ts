@@ -1,9 +1,10 @@
 import { UUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 import { Spot } from '@domain/spot/spot';
 import { Result } from '@common/logic';
+import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 
 type Hour = {
   isPremium: boolean;
@@ -29,9 +30,20 @@ type RegisterSpotInput = {
 
 @Injectable()
 export class RegisterSpot {
-  constructor(private readonly repository: SpotRepository) {}
+  constructor(
+    private readonly repository: SpotRepository,
+    private readonly establishmentRepository: EstablishmentRepository,
+  ) {}
 
   async execute(input: RegisterSpotInput) {
+    const establishment = await this.establishmentRepository
+      .bind(input.partnerId)
+      .get(input.establishmentId);
+
+    if (!establishment) {
+      return Result.Err(new NotFoundException('Establishment not found'));
+    }
+
     const spot: Spot = {
       rentSettings: input.rentSettings,
       modality: input.modality,

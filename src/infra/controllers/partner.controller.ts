@@ -11,6 +11,8 @@ export class PartnerController {
 
   @Post()
   async create(@Body() payload: PartnerRegister) {
-    await this.registerPartner.execute(payload);
+    const result = await this.registerPartner.execute(payload);
+
+    if (!result.isOk) throw result.value;
   }
 }

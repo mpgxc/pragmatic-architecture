@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 
 import { PartnerRepository } from '@infra/database/repositories/partner.repository';
-import { Ok } from '@common/logic';
+import { Ok, Result } from '@common/logic';
 
 type RegisterPartnerInput = {
   name: string;
@@ -17,7 +17,13 @@ export class RegisterPartner {
   constructor(private readonly repository: PartnerRepository) {}
 
   async execute(input: RegisterPartnerInput) {
-    // Check if exists by CNPJ
+    const alreadyExists = await this.repository.exists(input.cnpj);
+
+    if (alreadyExists) {
+      return Result.Err(
+        new ConflictException('Already exists a partner with same CNPJ'),
+      );
+    }
 
     await this.repository.create({
       cnpj: input.cnpj,

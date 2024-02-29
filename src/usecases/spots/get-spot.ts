@@ -18,12 +18,12 @@ export class GetSpot {
     establishmentId,
     spotId,
   }: GetSpotInput): Promise<Result<Spot, NotFoundException>> {
-    const { Content } = await this.repository.bind(establishmentId).get(spotId);
+    const spot = await this.repository.bind(establishmentId).get(spotId);
 
-    if (!Content) {
+    if (!spot) {
       return Result.Err(new NotFoundException('Spot not found'));
     }
 
-    return Result.Ok(Content);
+    return Result.Ok(spot);
   }
 }

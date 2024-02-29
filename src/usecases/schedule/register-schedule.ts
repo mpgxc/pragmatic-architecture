@@ -57,9 +57,7 @@ export class RegisterSchedule {
     }
 
     const [firstScheduleTime] = scheduleTimesAreValid.sortedScheduleTimes;
-    const startsFullDate = new Date(
-      `${input.date} $${firstScheduleTime.start}`,
-    );
+    const startsFullDate = new Date(`${input.date} ${firstScheduleTime.start}`);
 
     const now = new Date();
     const startsAfterNow = isAfter(startsFullDate, now);
@@ -117,7 +115,7 @@ export class RegisterSchedule {
 
     const weekday = getDay(startsFullDate);
 
-    const weekdaySpotSettings = spot.Content.rentSettings.find(
+    const weekdaySpotSettings = spot.rentSettings.find(
       (setting) => setting.weekday === weekday,
     );
 
@@ -156,8 +154,8 @@ export class RegisterSchedule {
     const schedule: Schedule = {
       date: input.date,
       leader: input.leader,
-      partnerId: spot.Content.partnerId,
-      spot: { modality: spot.Content.modality, name: spot.Content.name },
+      partnerId: spot.partnerId,
+      spot: { modality: spot.modality, name: spot.name },
       spotId: input.spotId,
       status: ScheduleStatus.CREATED,
       statusUpdates: [

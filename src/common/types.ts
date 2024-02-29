@@ -3,14 +3,14 @@ import { Pagination } from '@infra/database/dynamo/types';
 import { UUID } from 'node:crypto';
 
 export type OutputList<E> = {
-  Items: Entity<E>[];
+  Items: E[];
   LastEvaluatedKey: string;
   Count: number;
 };
 
 export interface Repository<E, Filters = any> {
   create(props: E): Promise<void>;
-  get(id: UUID): OptionalPromise<Entity<E>>;
+  get(id: UUID): OptionalPromise<E>;
   list(pagination: Pagination, filters?: Filters): Promise<OutputList<E>>;
   update(id: UUID, payload: Partial<E>): Promise<void>;
 }

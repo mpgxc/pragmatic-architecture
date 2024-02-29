@@ -22,7 +22,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { GetEstablishment } from '@usecases/establishments/get-establishment';
@@ -31,7 +30,7 @@ import { RegisterEstablishment } from '@usecases/establishments/register-establi
 import { UpdateEstablishment } from '@usecases/establishments/update-establishment';
 import { UpdateEstablishmentPicture } from '@usecases/establishments/update-establishment-picture';
 import { UUID } from 'node:crypto';
-import { ApiFileUpload } from './validators/common';
+import { ApiFileUpload, ApiResponse } from './validators/common';
 import {
   EstablishmentOutput,
   EstablishmentRegister,
@@ -71,7 +70,7 @@ export class EstablishmentController {
   }
 
   @Get('/:establishmentId')
-  @ApiOkResponse({ type: EstablishmentOutput })
+  @ApiResponse({ type: EstablishmentOutput })
   @HttpCode(HttpStatus.OK)
   async retrieve(
     @Param('partnerId') partnerId: UUID,
@@ -95,9 +94,7 @@ export class EstablishmentController {
   }
 
   @Get()
-  @ApiOkResponse({
-    type: [EstablishmentOutput],
-  })
+  @ApiResponse({ type: EstablishmentOutput, paginated: true })
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('partnerId') partnerId: UUID,
