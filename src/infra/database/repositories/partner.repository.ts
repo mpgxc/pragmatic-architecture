@@ -1,7 +1,7 @@
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
 import { OptionalPromise } from '@common/logic';
-import { Entity, Repository } from '@common/types';
+import { Repository } from '@common/types';
 import { Partner } from '@domain/partner/partner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -46,7 +46,7 @@ export class PartnerRepository
     });
   }
 
-  async get(partnerId: UUID): OptionalPromise<Entity<Partner>> {
+  async get(partnerId: UUID): OptionalPromise<Partner> {
     const { Items } = await this.client.query({
       KeyConditionExpression: '#PK = :PK AND begins_with(#SK, :SK)',
       ExpressionAttributeNames: {

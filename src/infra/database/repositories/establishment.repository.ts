@@ -2,7 +2,7 @@ import { QueryInput } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
 import { OptionalPromise } from '@common/logic';
-import { Entity, OutputList, Repository } from '@common/types';
+import { OutputList, Repository } from '@common/types';
 import { Establishment } from '@domain/establishment/establishment';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -56,7 +56,7 @@ class RepositoryActions
     });
   }
 
-  async get(establishmentId: UUID): OptionalPromise<Entity<Establishment>> {
+  async get(establishmentId: UUID): OptionalPromise<Establishment> {
     const { Item } = await this.client.find({
       Key: marshall({
         PK: `ESTABLISHMENT#${establishmentId}`,

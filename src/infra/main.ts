@@ -1,10 +1,12 @@
-import { LoggerService } from '@mpgxc/logger';
-import { ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { NestApplication, NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+
+import { LoggerService } from '@mpgxc/logger';
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import { NestApplication, NestFactory } from '@nestjs/core';
+
 import { InfraModule } from './infra.module';
+import { setupSwagger } from './swagger/setup';
 
 (async () => {
   const app = await NestFactory.create<NestApplication>(InfraModule);
@@ -31,20 +33,7 @@ import { InfraModule } from './infra.module';
   const enableSwagger = ['dev', 'hml'].includes(config.getOrThrow('NODE_ENV'));
 
   if (enableSwagger) {
-    const document = SwaggerModule.createDocument(
-      app,
-      new DocumentBuilder()
-        .setTitle('VamoJogar API')
-        .setDescription('Monolithic API for VamoJogar')
-        .setVersion('1.0')
-        .addTag('VamoJogar')
-        .build(),
-    );
-
-    /**
-     * Apenas um experimento
-     */
-    SwaggerModule.setup('/api/docs', app, document);
+    setupSwagger(app);
   }
 
   await app.listen(+config.getOrThrow('PORT'), '0.0.0.0');

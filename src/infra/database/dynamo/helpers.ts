@@ -22,7 +22,16 @@ type BuildUpdateParams = {
 abstract class ExtraRepositoryMethods {
   protected dynamoItemMapper = <T extends object>(
     item: Record<string, AttributeValue>,
-  ): Entity<T> => unmarshall(item) as Entity<T>;
+  ): T => {
+    const data = unmarshall(item) as Entity<T>;
+
+    return {
+      ...data.Content,
+      createdAt: data.Created,
+      updatedAt: data.Updated,
+      status: data.Status,
+    };
+  };
 
   protected extractCurrentPage = (
     LastEvaluatedKey: Record<string, AttributeValue>,

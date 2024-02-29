@@ -67,6 +67,6 @@ export class InfraModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(PartnerMiddleware)
-      .forRoutes(EstablishmentController, SpotController);
+      .forRoutes(EstablishmentController, SpotController, ScheduleController);
   }
 }

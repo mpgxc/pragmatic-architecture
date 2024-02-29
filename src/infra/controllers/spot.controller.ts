@@ -3,7 +3,6 @@ import { UUID } from 'node:crypto';
 import {
   ApiCreatedResponse,
   ApiNoContentResponse,
-  ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { LoggerService } from '@mpgxc/logger';
@@ -20,7 +19,7 @@ import {
   Query,
 } from '@nestjs/common';
 
-import { SpotRegister, SpotUpdate } from './validators/spot';
+import { SpotOutput, SpotRegister, SpotUpdate } from './validators/spot';
 
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { GetSpot } from '@usecases/spots/get-spot';
@@ -28,6 +27,7 @@ import { DateQueryParam, QueryParams } from './validators/query';
 import { ListSpots } from '@usecases/spots/list-spots';
 import { UpdateSpot } from '@usecases/spots/update-spot';
 import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
+import { ApiResponse } from './validators/common';
 
 @ApiTags('Spots')
 @Controller('partner/:partnerId/establishment/:establishmentId/spots')
@@ -70,7 +70,7 @@ export class SpotController {
   }
 
   @Get('/:spotId')
-  @ApiOkResponse()
+  @ApiResponse({ type: SpotOutput })
   @HttpCode(HttpStatus.OK)
   async retrieve(
     @Param('spotId', ParseUUIDPipe) spotId: UUID,
@@ -94,7 +94,7 @@ export class SpotController {
   }
 
   @Get()
-  @ApiOkResponse()
+  @ApiResponse({ type: SpotOutput, paginated: true })
   @HttpCode(HttpStatus.OK)
   async list(
     @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,
@@ -159,7 +159,6 @@ export class SpotController {
 
   // FIXME: Corrigir
   @Get('/schedules/availability')
-  @ApiOkResponse()
   @HttpCode(HttpStatus.OK)
   async availability(
     @Param('establishmentId', ParseUUIDPipe) establishmentId: UUID,

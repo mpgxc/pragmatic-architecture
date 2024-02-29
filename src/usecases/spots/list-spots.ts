@@ -1,5 +1,5 @@
 import { UUID } from 'node:crypto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 import { Result } from '@common/logic';
@@ -16,10 +16,6 @@ export class ListSpots {
 
   async execute({ establishmentId, pagination }: ListSpotsInput) {
     const spots = await this.repository.bind(establishmentId).list(pagination);
-
-    if (!spots.Items.length) {
-      return Result.Err(new NotFoundException('Spot not found!'));
-    }
 
     return Result.Ok(spots);
   }

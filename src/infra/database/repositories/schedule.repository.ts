@@ -2,7 +2,7 @@ import { AttributeValue, QueryInput } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
 import { OptionalPromise } from '@common/logic';
-import { Entity, OutputList, Repository } from '@common/types';
+import { OutputList, Repository } from '@common/types';
 import { Schedule } from '@domain/schedule/schedule';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -54,7 +54,7 @@ export class RepositoryActions
     });
   }
 
-  async get(id: UUID): OptionalPromise<Entity<Schedule>> {
+  async get(id: UUID): OptionalPromise<Schedule> {
     console.log({ id });
     return null;
   }
@@ -122,7 +122,7 @@ export class RepositoryActions
     };
 
     const { Items } = await this.client.query(command);
-    return Items.map((item) => this.dynamoItemMapper<Schedule>(item).Content);
+    return Items.map((item) => this.dynamoItemMapper<Schedule>(item));
   }
 
   async getSchedulesAtEstablishmentByDate(
@@ -172,8 +172,6 @@ export class RepositoryActions
       aggregates.push(...Items);
     }
 
-    return aggregates.map(
-      (item) => this.dynamoItemMapper<Schedule>(item).Content,
-    );
+    return aggregates.map((item) => this.dynamoItemMapper<Schedule>(item));
   }
 }

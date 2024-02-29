@@ -1,6 +1,6 @@
 import { UUID, randomUUID } from 'node:crypto';
 
-import { Entity, OutputList, Repository } from '@common/types';
+import { OutputList, Repository } from '@common/types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -57,7 +57,7 @@ export class RepositoryActions
     });
   }
 
-  async get(spotId: UUID): OptionalPromise<Entity<Spot>> {
+  async get(spotId: UUID): OptionalPromise<Spot> {
     const { Item } = await this.client.find({
       Key: marshall({
         PK: `SPOT#${spotId}`,

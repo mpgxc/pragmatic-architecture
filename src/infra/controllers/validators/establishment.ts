@@ -203,4 +203,10 @@ export class EstablishmentOutput implements Establishment {
     open: string;
     close: string;
   };
+
+  @ApiProperty({ example: '5b268c50-ea8c-4133-a221-bc15e86ce965' })
+  partnerId?: string;
+
+  @ApiProperty({ example: '28b2fa8c-b305-41ce-a547-2c1c62617757' })
+  establishmentId?: string;
 }
