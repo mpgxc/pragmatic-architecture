@@ -156,14 +156,14 @@ export class RepositoryActions
       const { Items } = await this.client.query({
         IndexName: 'SK-index',
         KeyConditionExpression: '#SK = :SK',
-        FilterExpression: 'begins_with(#PK, :PK) AND #Date = :date',
+        FilterExpression: 'begins_with(#PK, :PK) AND Content.#Date = :date',
         ExpressionAttributeValues: marshall({
           ':PK': 'SCHEDULE#',
           ':SK': PK,
           ':date': date,
         }),
         ExpressionAttributeNames: {
-          '#Date': 'Date',
+          '#Date': 'date',
           '#PK': 'PK',
           '#SK': 'SK',
         },
