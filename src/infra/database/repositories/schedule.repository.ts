@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
-import { UUID, randomUUID } from 'crypto';
+import { AttributeValue, QueryInput } from '@aws-sdk/client-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { entityFactory } from '@common/helpers';
+import { OptionalPromise } from '@common/logic';
 import { Entity, OutputList, Repository } from '@common/types';
 import { Schedule } from '@domain/schedule/schedule';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { UUID, randomUUID } from 'node:crypto';
+import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
-import { OptionalPromise } from '@common/logic';
 import { DynamoCommand, Pagination } from '../dynamo/types';
-import { entityFactory } from '@common/helpers';
-import { marshall } from '@aws-sdk/util-dynamodb';
-import { QueryInput, ScanCommandInput } from '@aws-sdk/client-dynamodb';
 
 @Injectable()
 export class ScheduleRepository {
@@ -129,22 +129,51 @@ export class RepositoryActions
     date: string,
     establishmentId: string,
   ): Promise<Schedule[]> {
-    const command: DynamoCommand<ScanCommandInput> = {
-      ExpressionAttributeNames: {
-        '#PK': 'PK',
-        '#Date': 'date',
-        '#EstablishmentId': 'establishmentId',
-      },
-      FilterExpression:
-        'begins_with(#PK, :PK) AND Content.#Date = :Date AND Content.#EstablishmentId = :EstablishmentId',
+    const { Items } = await this.client.query({
+      IndexName: 'SK-index',
+      KeyConditionExpression: '#SK = :SK',
+      FilterExpression: 'begins_with(#PK, :PK)',
       ExpressionAttributeValues: marshall({
-        ':PK': 'SCHEDULE#',
-        ':Date': date,
-        ':EstablishmentId': establishmentId,
+        ':SK': `ESTABLISHMENT#${establishmentId}`,
+        ':PK': `SPOT#`,
       }),
-    };
+      ExpressionAttributeNames: {
+        '#SK': 'SK',
+        '#PK': 'PK',
+      },
+      ProjectionExpression: 'PK',
+    });
 
-    const { Items } = await this.client.scan(command);
-    return Items.map((item) => this.dynamoItemMapper<Schedule>(item).Content);
+    if (!Items) return [];
+
+    const spots = Items.map(unmarshall as never) as {
+      PK: string;
+    }[];
+
+    const aggregates: Record<string, AttributeValue>[] = [];
+
+    for (const { PK } of spots) {
+      const { Items } = await this.client.query({
+        IndexName: 'SK-index',
+        KeyConditionExpression: '#SK = :SK',
+        FilterExpression: 'begins_with(#PK, :PK) AND #Date = :date',
+        ExpressionAttributeValues: marshall({
+          ':PK': 'SCHEDULE#',
+          ':SK': PK,
+          ':date': date,
+        }),
+        ExpressionAttributeNames: {
+          '#Date': 'Date',
+          '#PK': 'PK',
+          '#SK': 'SK',
+        },
+      });
+
+      aggregates.push(...Items);
+    }
+
+    return aggregates.map(
+      (item) => this.dynamoItemMapper<Schedule>(item).Content,
+    );
   }
 }
