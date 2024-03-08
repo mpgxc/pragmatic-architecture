@@ -23,9 +23,6 @@ export class PartnerRepository
     this.client.setTableName(this.config.getOrThrow('AWS_DYNAMODB_TABLE'));
   }
 
-  /**
-   * @TODO: esse método será refatorado para receber os dados do parceiro
-   */
   async create(props: Partner) {
     const partnerId = randomUUID();
 
