@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { Establishment } from '@domain/establishment/establishment';
+import { Establishment } from '@domain/establishment';
 import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 import { UUID } from 'node:crypto';
 

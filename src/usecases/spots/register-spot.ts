@@ -2,7 +2,7 @@ import { UUID } from 'node:crypto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
-import { Spot } from '@domain/spot/spot';
+import { Spot } from '@domain/spot';
 import { Result } from '@common/logic';
 import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 

@@ -3,7 +3,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
 import { OptionalPromise } from '@common/logic';
 import { OutputList, Repository } from '@common/types';
-import { Schedule } from '@domain/schedule/schedule';
+import { Schedule } from '@domain/schedule';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UUID, randomUUID } from 'node:crypto';

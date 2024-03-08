@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UUID } from 'node:crypto';
 
 import { Result } from '@common/logic';
-import { Spot } from '@domain/spot/spot';
+import { Spot } from '@domain/spot';
 import { SpotRepository } from '@infra/database/repositories/spot.repository';
 
 type GetSpotInput = {

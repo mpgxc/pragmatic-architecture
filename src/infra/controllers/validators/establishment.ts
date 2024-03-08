@@ -1,4 +1,4 @@
-import { Address, Establishment } from '@domain/establishment/establishment';
+import { Address, Establishment } from '@domain/establishment';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {

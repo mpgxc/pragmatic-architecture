@@ -2,7 +2,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { entityFactory } from '@common/helpers';
 import { OptionalPromise } from '@common/logic';
 import { Repository } from '@common/types';
-import { Partner } from '@domain/partner/partner';
+import { Partner } from '@domain/partner';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UUID, randomUUID } from 'node:crypto';
