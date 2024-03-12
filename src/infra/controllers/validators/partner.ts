@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsMobilePhone,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+} from 'class-validator';
 
 export class PartnerRegister {
   @ApiProperty({ example: 'Arena XR' })
@@ -14,15 +20,18 @@ export class PartnerRegister {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ example: '88981434688' })
-  @IsString()
+  @ApiProperty({
+    example: '(88)981434688',
+    description: 'Phone number with DDD',
+  })
+  @IsPhoneNumber('BR')
+  @IsMobilePhone('pt-BR')
   phone: string;
 
   @ApiProperty({ example: '12312312312312' })
   @IsString()
   cnpj: string;
 
-  @ApiProperty({ example: 'picture.png' })
-  @IsString()
-  picture: string;
+  @IsOptional()
+  picture: string = '';
 }

@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { DynamoRepositoryService } from '../dynamo/dynamo-repository.service';
 import { ExtraRepositoryMethods } from '../dynamo/helpers';
 
-import { Spot } from '@domain/spot/spot';
+import { Spot } from '@domain/spot';
 import { entityFactory } from '@common/helpers';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { DynamoCommand, Pagination } from '../dynamo/types';

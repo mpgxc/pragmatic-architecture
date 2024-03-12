@@ -17,7 +17,7 @@ import {
   ScheduleStatus,
   calculateNumberOfHours,
   validateScheduleTimes,
-} from '@domain/schedule/schedule';
+} from '@domain/schedule';
 
 type ScheduleTime = {
   start: string;

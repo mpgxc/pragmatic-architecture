@@ -1,4 +1,4 @@
-import { Establishment } from '@domain/establishment/establishment';
+import { Establishment } from '@domain/establishment';
 import { EstablishmentRepository } from '@infra/database/repositories/establishment.repository';
 import { Injectable } from '@nestjs/common';
 import { UUID } from 'node:crypto';
