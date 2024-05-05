@@ -1,9 +1,9 @@
 import { Inject, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { LoggerService } from '@mpgxc/logx';
 import { FirebaseStorageProvider } from './firebase-storage.provider';
 import { LocalStorageProvider } from './local-storage.provider';
-import { LoggerService } from '@mpgxc/logger';
 
 const StorageProvider = 'StorageProvider';
 
@@ -50,4 +50,4 @@ const storageFactoryProvider: Provider = {
   ],
 };
 
-export { StorageProvider, storageFactoryProvider, Storage };
+export { Storage, storageFactoryProvider, StorageProvider };

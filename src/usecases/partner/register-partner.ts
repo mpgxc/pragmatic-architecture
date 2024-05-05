@@ -1,7 +1,7 @@
 import { Result } from '@common/logic';
 import { Partner as RegisterPartnerInput } from '@domain/partner';
 import { PartnerRepository } from '@infra/database/repositories/partner.repository';
-import { LoggerService } from '@mpgxc/logger';
+import { LoggerService } from '@mpgxc/logx';
 import {
   ConflictException,
   Injectable,

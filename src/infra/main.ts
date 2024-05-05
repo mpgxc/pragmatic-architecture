@@ -1,8 +1,8 @@
 import helmet from 'helmet';
 
-import { LoggerService } from '@mpgxc/logger';
-import { ConfigService } from '@nestjs/config';
+import { LoggerService } from '@mpgxc/logx';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestApplication, NestFactory } from '@nestjs/core';
 
 import { InfraModule } from './infra.module';

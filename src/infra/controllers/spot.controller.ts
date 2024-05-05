@@ -1,11 +1,6 @@
 import { UUID } from 'node:crypto';
 
-import {
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { LoggerService } from '@mpgxc/logger';
+import { LoggerService } from '@mpgxc/logx';
 import {
   Body,
   Controller,
@@ -18,16 +13,21 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { SpotOutput, SpotRegister, SpotUpdate } from './validators/spot';
 
-import { RegisterSpot } from '@usecases/spots/register-spot';
 import { GetSpot } from '@usecases/spots/get-spot';
-import { DateQueryParam, QueryParams } from './validators/query';
-import { ListSpots } from '@usecases/spots/list-spots';
-import { UpdateSpot } from '@usecases/spots/update-spot';
 import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
+import { ListSpots } from '@usecases/spots/list-spots';
+import { RegisterSpot } from '@usecases/spots/register-spot';
+import { UpdateSpot } from '@usecases/spots/update-spot';
 import { ApiResponse } from './validators/common';
+import { DateQueryParam, QueryParams } from './validators/query';
 
 @ApiTags('Spots')
 @Controller('partner/:partnerId/establishment/:establishmentId/spots')

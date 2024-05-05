@@ -1,4 +1,4 @@
-import { LoggerModule } from '@mpgxc/logger';
+import { LoggerModule } from '@mpgxc/logx';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TerminusModule } from '@nestjs/terminus';
@@ -10,6 +10,7 @@ import { UpdateEstablishmentPicture } from '@usecases/establishments/update-esta
 import { RegisterPartner } from '@usecases/partner/register-partner';
 import { RegisterSchedule } from '@usecases/schedule/register-schedule';
 import { GetSpot } from '@usecases/spots/get-spot';
+import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
 import { ListSpots } from '@usecases/spots/list-spots';
 import { RegisterSpot } from '@usecases/spots/register-spot';
 import { UpdateSpot } from '@usecases/spots/update-spot';
@@ -22,7 +23,6 @@ import { ThirdPartyController } from './controllers/third-party.controller';
 import { DatabaseModule } from './database/database.module';
 import { PartnerMiddleware } from './middlewares/partner.middleware';
 import { ProvidersModule } from './providers/providers.module';
-import { GetSpotsAvailability } from '@usecases/spots/get-spots-availability';
 
 @Module({
   imports: [

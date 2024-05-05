@@ -3,7 +3,7 @@ import {
   UploadFileInterceptor,
   UploadedFile,
 } from '@infra/interceptors/upload-file.interceptor';
-import { LoggerInject, LoggerService } from '@mpgxc/logger';
+import { LoggerInject, LoggerService } from '@mpgxc/logx';
 import {
   Body,
   Controller,

@@ -1,4 +1,4 @@
-import { LoggerInject, LoggerService } from '@mpgxc/logger';
+import { LoggerInject, LoggerService } from '@mpgxc/logx';
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags } from '@nestjs/swagger';

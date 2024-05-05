@@ -1,3 +1,9 @@
+import { StorageProvider } from '@infra/providers/storage/storage.factory';
+import {
+  IStorageProvider,
+  UploadFileOptions,
+} from '@infra/providers/storage/storage.provider';
+import { LoggerInject, LoggerService } from '@mpgxc/logx';
 import {
   BadRequestException,
   CallHandler,
@@ -8,15 +14,9 @@ import {
   createParamDecorator,
   mixin,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
-import {
-  IStorageProvider,
-  UploadFileOptions,
-} from '@infra/providers/storage/storage.provider';
-import { StorageProvider } from '@infra/providers/storage/storage.factory';
-import { LoggerInject, LoggerService } from '@mpgxc/logger';
+import { Observable } from 'rxjs';
 
 export const UploadedFile = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {

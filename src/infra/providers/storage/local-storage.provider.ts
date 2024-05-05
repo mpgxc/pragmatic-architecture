@@ -1,8 +1,8 @@
-import { resolve } from 'node:path';
 import { createWriteStream, unlinkSync } from 'node:fs';
+import { resolve } from 'node:path';
 
+import { LoggerService } from '@mpgxc/logx';
 import { Injectable } from '@nestjs/common';
-import { LoggerService } from '@mpgxc/logger';
 
 import { IStorageProvider, UploadFileOptions } from './storage.provider';
 
