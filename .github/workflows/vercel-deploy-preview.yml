@@ -26,6 +26,8 @@ jobs:
 
       - name: 📦 Install Dependencies
         run: npm install
+        env:
+          PERSONAL_ACCESS_GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_GITHUB_TOKEN }}
 
       - name: 🛠️ Install Vercel CLI
         run: npm install --global vercel@latest
